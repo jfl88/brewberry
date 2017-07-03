@@ -3,7 +3,7 @@ var dblogin = require('./dblogin.json');
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 
-var url = 'mongodb://' + dblogin.user + ':' + dblogin.pw + '@ds064299.mlab.com:64299/beermon-db';
+var url = 'mongodb://' + dblogin.user + ':' + dblogin.pw + '@' + dblogin.addr;
 var sensors = [];
 var tempRec = {};
 
@@ -23,6 +23,11 @@ ds18b20.sensors(function(err, ids) {
       console.log('New Temp Inserted:' + JSON.stringify(result));
     });
     
+    db.collection('brews').find({complete: false}).forEach(function (b) {
+      b.tempData.push(tempRec);
+      db.collection('brews').save(b);
+    });
+
     setInterval(function() {
       ts = new Date();
       temp = ds18b20.temperatureSync(sensors[0]);
@@ -33,6 +38,10 @@ ds18b20.sensors(function(err, ids) {
         db.collection('temps').insert(tempRec, function(err, result) {
           assert.equal(null, err);
           console.log('New Temp Inserted:' + JSON.stringify(result));
+        });
+        db.collection('brews').find({complete: false}).forEach(function (b) {
+          b.tempData.push(tempRec);
+          db.collection('brews').save(b);
         });
       }
     }, 60000);
