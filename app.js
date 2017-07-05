@@ -13,6 +13,12 @@ var prevTemp = 0;
 io.on('connection', function(socket) { 
   console.log('someone connected!');
 
+  var ts = new Date();
+  var temp = ds18b20.temperatureSync(sensors[0]);
+  socket.emit('liveTemp', { timestamp: ts, temp: temp });
+  prevTemp = temp;
+
+
   setInterval(function() {
     var ts = new Date();
     var temp = ds18b20.temperatureSync(sensors[0]);
