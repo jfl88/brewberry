@@ -1,7 +1,7 @@
 {
   "name": "temp-record",
   "version": "1.0.0",
-  "description": "Records temperature to an NEDB file",
+  "description": "Records temperature to a MongoDB and runs a websocket server for live temperature.",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,6 +11,6 @@
   "dependencies": {
     "ds18b20": "^0.1.0",
     "mongodb": "^2.2.26",
-    "nedb": "^1.8.0"
+    "socket.io": "^2.0.3"
   }
 }

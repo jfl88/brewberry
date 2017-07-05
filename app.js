@@ -2,10 +2,27 @@ var ds18b20 = require('ds18b20');
 var dblogin = require('./dblogin.json');
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
+var io = require('socket.io')(3001);
 
 var url = 'mongodb://' + dblogin.user + ':' + dblogin.pw + '@' + dblogin.addr;
 var sensors = [];
 var tempRec = {};
+
+var prevTemp = 0;
+
+io.on('connection', function(socket) { 
+  console.log('someone connected!');
+
+  setInterval(function() {
+    var ts = new Date();
+    var temp = ds18b20.temperatureSync(sensors[0]);
+    if (prevTemp !== temp) {
+      console.log ('emitting! ' + temp);
+      socket.emit('liveTemp', { timestamp: ts, temp: temp });
+      prevTemp = temp;
+    }
+  }, 1000);
+});
 
 ds18b20.sensors(function(err, ids) {
   sensors = ids;
