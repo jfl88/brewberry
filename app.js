@@ -16,19 +16,23 @@ io.on('connection', function(socket) {
   var ts = new Date();
   var temp = ds18b20.temperatureSync(sensors[0]);
   socket.emit('liveTemp', { timestamp: ts, temp: temp });
-  prevTemp = temp;
 
-
-  setInterval(function() {
-    var ts = new Date();
-    var temp = ds18b20.temperatureSync(sensors[0]);
-    if (prevTemp !== temp) {
-      console.log ('emitting! ' + temp);
-      socket.emit('liveTemp', { timestamp: ts, temp: temp });
-      prevTemp = temp;
-    }
-  }, 1000);
+  socket.on('disconnect', function() {
+    console.log('A user disconnected');
+  });
 });
+
+var interval = setInterval(function() {
+  var ts = new Date();
+  var temp = ds18b20.temperatureSync(sensors[0]);
+
+  if (prevTemp !== temp) {
+    console.log ('emitting! ' + temp);
+    io.emit('liveTemp', { timestamp: ts, temp: temp });
+    prevTemp = temp;
+  }
+}, 1000);
+
 
 ds18b20.sensors(function(err, ids) {
   sensors = ids;
