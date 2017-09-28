@@ -49,17 +49,19 @@ ds18b20.sensors(function(err, ids) {
     db.collection('temps').insert(tempRec, function(err, result) {
       console.log('New Temp Inserted:' + JSON.stringify(result));
     });
-    
+
     db.collection('brews').find({complete: false}).forEach(function (b) {
-      b.tempData.push(tempRec);
-      db.collection('brews').save(b);
+      if (b.tempData[b.tempData.length - 1].timestamp < tempRec.timestamp) {
+        b.tempData.push(tempRec);
+        db.collection('brews').save(b);
+      }
     });
 
     setInterval(function() {
       ts = new Date();
       temp = ds18b20.temperatureSync(sensors[0]);
-        
-      if (temp !== tempRec.temp) { 
+
+      if (temp !== tempRec.temp) {
         tempRec = { timestamp: ts, temp: temp };
 	console.log(JSON.stringify(tempRec));
         db.collection('temps').insert(tempRec, function(err, result) {
@@ -72,7 +74,7 @@ ds18b20.sensors(function(err, ids) {
         });
       }
     }, 60000);
-    
+
     // catch ctrl+c event and exit normally
     process.on('SIGINT', function () {
       console.log('Ctrl-C...');
