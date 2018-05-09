@@ -1,6 +1,6 @@
 module.exports = {
     lastCycle: (new Date()).getTime(),
-    interval: 100000,
+    interval: 3600000,
     temperature: function(id, cb) {
         var currentCheck = (new Date()).getTime();
         var millisecondsSinceLastCheck = currentCheck - this.lastCycle;
