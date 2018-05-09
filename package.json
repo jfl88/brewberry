@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "ds18b20": "^0.1.0",
+    "dynamodb": "^1.1.1",
+    "joi": "^13.3.0",
     "mongodb": "^2.2.26",
     "socket.io": "^2.0.3"
   }
