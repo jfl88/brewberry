@@ -1,7 +1,10 @@
 // Sub with var ds18b20 = require('./tests/mockSensor') for a sensor
 // that returns a sine wave of 50 to 150 over 100 seconds.
-const ds18b20 = require('./tests/mockSensor');
-// const ds18b20 = require('ds18b20');
+if (process.env.DEVICE_ID)
+  const ds18b20 = require('ds18b20');
+else
+  const ds18b20 = require('./tests/mockSensor');
+
 const socketLib = require('socket.io');
 
 var io = socketLib(3001);
