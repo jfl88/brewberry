@@ -1,6 +1,6 @@
 // Sub with var ds18b20 = require('./tests/mockSensor') for a sensor
 // that returns a sine wave of 50 to 150 over 100 seconds.
-if (process.env.DEVICE_ID)
+if (process.env.DEVICE_ID != undefined)
   const ds18b20 = require('ds18b20');
 else
   const ds18b20 = require('./tests/mockSensor');
