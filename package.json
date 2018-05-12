@@ -13,6 +13,7 @@
     "dynamodb": "^1.1.1",
     "joi": "^13.3.0",
     "mongodb": "^2.2.26",
-    "socket.io": "^2.0.3"
+    "socket.io": "^2.0.3",
+    "socket.io-client": "^2.1.0"
   }
 }
