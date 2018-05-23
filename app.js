@@ -1,87 +1,69 @@
-var ds18b20 = require('ds18b20');
-var dblogin = require('./dblogin.json');
-var MongoClient = require('mongodb').MongoClient;
-var assert = require('assert');
-var io = require('socket.io')(3001);
+// Sub with var ds18b20 = require('./tests/mockSensor') for a sensor
+// that returns a sine wave of 50 to 150 over 100 seconds.
+if (process.env.DEVICE_ID != undefined) {
+  var ds18b20 = require('ds18b20');
+} else {
+  var ds18b20 = require('./tests/mockSensor');
+}
 
-var url = 'mongodb://' + dblogin.user + ':' + dblogin.pw + '@' + dblogin.addr;
-var sensors = [];
-var tempRec = {};
+const brewHome = process.env.BREWHOME || 'http://brew.stasmo.wtf:3000';
+const socketServer = require('socket.io');
+const socketClient = require('socket.io-client');
+const serverListenPort = 4000;
 
-var prevTemp = 0;
 
-io.on('connection', function(socket) { 
-  console.log('someone connected!');
+var io = socketServer(serverListenPort);
+var logger = require('./logger')(io);
+var ioClient;
 
-  var ts = new Date();
-  var temp = ds18b20.temperatureSync(sensors[0]);
-  socket.emit('liveTemp', { timestamp: ts, temp: temp });
+try {
+  ioClient = socketClient(brewHome);
+} catch (e) {
+  console.log('Could not connect to registry')
+}
 
-  socket.on('disconnect', function() {
-    console.log('A user disconnected');
-  });
-});
+var sensors = [],
+  collectInterval = 1000,
+  lastRecord = { id: process.env.DEVICE_ID },
+  currentRecord = { deviceId: process.env.DEVICE_ID };
 
-var interval = setInterval(function() {
-  var ts = new Date();
-  var temp = ds18b20.temperatureSync(sensors[0]);
+function collectTemperatureData()
+{
+  lastRecord.temp         = currentRecord.temp;
+  lastRecord.timestamp    = currentRecord.timestamp;
+  currentRecord.temp      = ds18b20.temperatureSync(sensors[0]);
+  currentRecord.timestamp = (new Date()).getTime();
 
-  if (prevTemp !== temp) {
-    console.log ('emitting! ' + temp);
-    io.emit('liveTemp', { timestamp: ts, temp: temp });
-    prevTemp = temp;
+  if (lastRecord.temp != currentRecord.temp) {
+    io.emit('liveTemp', currentRecord);
+    ioClient.emit('liveTemp', currentRecord);
   }
-}, 1000);
 
+  logger.log(currentRecord)
+  return currentRecord;
+}
 
-ds18b20.sensors(function(err, ids) {
-  sensors = ids;
-  console.log(sensors);
-
-  MongoClient.connect(url, function(err, db) {
-    assert.equal(null, err);
-    console.log('Connected successfully to server');
-
-    var ts = new Date();
-    var temp = ds18b20.temperatureSync(sensors[0]);
-
-    tempRec = { timestamp: ts, temp: temp };
-    db.collection('temps').insert(tempRec, function(err, result) {
-      console.log('New Temp Inserted:' + JSON.stringify(result));
-    });
-
-    db.collection('brews').find({complete: false}).forEach(function (b) {
-      if (b.tempData[b.tempData.length - 1].timestamp < tempRec.timestamp) {
-        b.tempData.push(tempRec);
-        db.collection('brews').save(b);
-      }
-    });
-
-    setInterval(function() {
-      ts = new Date();
-      temp = ds18b20.temperatureSync(sensors[0]);
-
-      if (temp !== tempRec.temp) {
-        tempRec = { timestamp: ts, temp: temp };
-	console.log(JSON.stringify(tempRec));
-        db.collection('temps').insert(tempRec, function(err, result) {
-          assert.equal(null, err);
-          console.log('New Temp Inserted:' + JSON.stringify(result));
-        });
-        db.collection('brews').find({complete: false}).forEach(function (b) {
-          b.tempData.push(tempRec);
-          db.collection('brews').save(b);
-        });
-      }
-    }, 60000);
-
-    // catch ctrl+c event and exit normally
-    process.on('SIGINT', function () {
-      console.log('Ctrl-C...');
-      db.close();
-      process.exit(2);
-    });
-
+function init()
+{
+  ds18b20.sensors((err, ids) => {
+    if (err) {
+      logger.log("Error initializing sensors: " + err.message)
+      shutdown();
+    }
+    sensors = ids;
+    collectTemperatureData();
+    setInterval(collectTemperatureData, collectInterval);
   });
-});
+}
 
+function shutdown() {
+  logger.log('Shutting down');
+  io.close();
+  ioClient.close();
+  process.exit(2);
+}
+
+// catch ctrl+c event and exit normally
+process.on('SIGINT', shutdown);
+
+init();
