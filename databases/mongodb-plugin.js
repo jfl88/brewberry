@@ -1,8 +1,6 @@
 const MongoClient = require('mongodb').MongoClient;
-const dblogin = require('../dblogin');
-var mongoConnectionString = 'mongodb://' + dblogin.user + ':' + dblogin.pw + '@' + dblogin.addr;
-var database;
 
+var database;
 
 module.exports = function(logger) {
   MongoClient.connect(mongoConnectionString, function(err, db) {

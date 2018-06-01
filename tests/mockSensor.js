@@ -18,7 +18,7 @@ module.exports = {
         if (millisecondsSinceLastCheck > this.interval)
             this.lastCycle = currentCheck
 
-        return 100 + Math.sin(Math.PI * 2 * millisecondsSinceLastCheck/this.interval) * 50;
+        return 20 + Math.sin(Math.PI * 2 * millisecondsSinceLastCheck/this.interval) * 50;
     },
     sensors: function(cb) {
         cb(null, [0])

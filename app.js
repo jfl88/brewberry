@@ -6,15 +6,21 @@ if (process.env.DEVICE_ID != undefined) {
   var ds18b20 = require('./tests/mockSensor');
 }
 
-const brewHome = process.env.BREWHOME || 'http://brew.stasmo.wtf:3000';
+const config = require('./config');
+var dbConnectionString = 'mongodb://' + config.dbuser + ':' + config.dbpw + '@' + config.addr;
+
+const brewHome = process.env.BREWHOME;
 const socketServer = require('socket.io');
 const socketClient = require('socket.io-client');
-const serverListenPort = 4000;
+const express = require('express');
+const ioListenPort = 4000;
+const webListenPort = 3000;
 
 
-var io = socketServer(serverListenPort);
+var io = socketServer(ioListenPort);
 var logger = require('./logger')(io);
 var ioClient;
+var webapp = express();
 
 try {
   ioClient = socketClient(brewHome);
@@ -36,7 +42,8 @@ function collectTemperatureData()
 
   if (lastRecord.temp != currentRecord.temp) {
     io.emit('liveTemp', currentRecord);
-    ioClient.emit('liveTemp', currentRecord);
+    if (ioClient)
+      ioClient.emit('liveTemp', currentRecord);
   }
 
   logger.log(currentRecord)
@@ -54,12 +61,17 @@ function init()
     collectTemperatureData();
     setInterval(collectTemperatureData, collectInterval);
   });
+
+  webapp.get('/', (req, res) => res.send('Hello World!'));
+
+  webapp.listen(webListenPort, () => console.log('Example app listening on port 3000!'))
 }
 
 function shutdown() {
   logger.log('Shutting down');
   io.close();
-  ioClient.close();
+  if (ioClient)
+    ioClient.close();
   process.exit(2);
 }
 

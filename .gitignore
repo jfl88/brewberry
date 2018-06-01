@@ -57,5 +57,5 @@ typings/
 # dotenv environment variables file
 .env
 
-# database credentials
-dblogin.json
+# database credentials and setup parameters
+config.json
