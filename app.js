@@ -12,15 +12,22 @@ var dbConnectionString = 'mongodb://' + config.dbuser + ':' + config.dbpw + '@' 
 const brewHome = process.env.BREWHOME;
 const socketServer = require('socket.io');
 const socketClient = require('socket.io-client');
-const express = require('express');
+
 const ioListenPort = 4000;
 const webListenPort = 3000;
 
+const webapp = require('./webapp/app');
+const debug = require('debug')('brewtest:server');
+const http = require('http');
 
 var io = socketServer(ioListenPort);
 var logger = require('./logger')(io);
 var ioClient;
-var webapp = express();
+
+var port = normalizePort(process.env.PORT || '3000');
+webapp.set('port', port);
+
+var server = http.createServer(webapp);
 
 try {
   ioClient = socketClient(brewHome);
@@ -50,6 +57,66 @@ function collectTemperatureData()
   return currentRecord;
 }
 
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
+
 function init()
 {
   ds18b20.sensors((err, ids) => {
@@ -62,9 +129,9 @@ function init()
     setInterval(collectTemperatureData, collectInterval);
   });
 
-  webapp.get('/', (req, res) => res.send('Hello World!'));
-
-  webapp.listen(webListenPort, () => console.log('Example app listening on port 3000!'))
+  server.listen(port);
+  server.on('error', onError);
+  server.on('listening', onListening);
 }
 
 function shutdown() {

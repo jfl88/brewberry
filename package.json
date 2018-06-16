@@ -9,11 +9,18 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "basic-auth": "^2.0.0",
+    "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
+    "debug": "^3.1.0",
     "ds18b20": "^0.1.0",
     "dynamodb": "^1.1.1",
     "express": "^4.16.3",
+    "jade": "^1.11.0",
     "joi": "^13.3.0",
     "mongodb": "^2.2.26",
+    "morgan": "^1.9.0",
+    "serve-favicon": "^2.5.0",
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.1.0"
   }
