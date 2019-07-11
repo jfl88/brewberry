@@ -17,19 +17,19 @@ block content
               a(href='{{ currentBrew.recipeUrl }}') {{ currentBrew.name }}
             p
               label Stage:
-              &nbspFermentation (started {{ currentBrew.startDT | date }})
+              &nbsp Fermentation (started {{ currentBrew.startDT | date }})
             p
               label Last Recorded Temp:
-              &nbsp{{ brewData[0].y[brewData[0].y.length - 1] }} at {{ brewData[0].x[brewData[0].x.length - 1].toString() }}
+              &nbsp {{ brewData[0].y[brewData[0].y.length - 1] }} at {{ brewData[0].x[brewData[0].x.length - 1].toString() }}
       .col-sm-3.col-md-6
         .panel.panel-default
           .panel-heading
             label Live Temp
           .panel-body
             h1
-              &nbsp{{ liveTemp }}°C 
+              {{ liveTemp }}°C 
             h3
-              &nbsp{{ ((liveTemp * 9) / 5) + 32 | number:1 }}°F
+              {{ ((liveTemp * 9) / 5) + 32 | number:1 }}°F
     .row
       .col-md-12
         .panel.panel-default

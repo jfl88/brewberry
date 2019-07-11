@@ -3,11 +3,11 @@ var router = express.Router();
 var basicAuth = require('basic-auth');
 
 // db stuff
-var config = require('../../config.json');
+var dblogin = require('../../config.json');
 var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectId;
 var assert = require('assert');
-var url = 'mongodb://' + config.user + ':' + config.pw + '@' + config.addr;
+var url = 'mongodb://' + dblogin.user + ':' + dblogin.pw + '@' + dblogin.addr;
 
 var auth = function (req, res, next) {
   function unauthorized(res) {
@@ -21,7 +21,7 @@ var auth = function (req, res, next) {
     return unauthorized(res);
   };
 
-  if (user.name === config.control_login && user.pass === config.control_password) {
+  if (user.name === dblogin.control_login && user.pass === dblogin.control_password) {
     return next();
   } else {
     return unauthorized(res);

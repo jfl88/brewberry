@@ -2,14 +2,14 @@ var express = require('express');
 var router = express.Router();
 
 // db stuff
-var config = require('../../config.json');
+var dblogin = require('../../config.json');
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
-var url = 'mongodb://' + config.dbuser + ':' + config.dbpw + '@' + config.addr;
+var url = 'mongodb://' + dblogin.user + ':' + dblogin.pw + '@' + dblogin.addr;
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Jason\'s Magical Brewing Land' });
+  res.render('index', { title: 'Bellthorpe Brewing' });
 });
 
 router.route('/api/currentbrew')

@@ -24,7 +24,7 @@ var io = socketServer(ioListenPort);
 var logger = require('./logger')(io);
 var ioClient;
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT || webListenPort);
 webapp.set('port', port);
 
 var server = http.createServer(webapp);

@@ -2,10 +2,10 @@ var express = require('express');
 var router = express.Router();
 
 // db stuff
-var config = require('../../config.json');
+var dblogin = require('../../config.json');
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
-var url = 'mongodb://' + config.dbuser + ':' + config.dbpw + '@' + config.addr;
+var url = 'mongodb://' + dblogin.user + ':' + dblogin.pw + '@' + dblogin.addr;
 
 /* GET history page. */
 router.get('/', function(req, res, next) {
@@ -17,7 +17,7 @@ router.get('/', function(req, res, next) {
       assert.equal(err, null);
       console.log("Found the following records");
       console.dir(docs)
-      res.render('history', { title: 'Jason\'s Magical Brewing Land - Brew History', brews: docs });
+      res.render('history', { title: 'Bellthorpe Brewing - Brew History', brews: docs });
     });      
   });
 });

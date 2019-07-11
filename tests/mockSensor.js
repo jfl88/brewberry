@@ -1,14 +1,6 @@
 module.exports = {
     lastCycle: (new Date()).getTime(),
-    interval: 3600000,
-    temperature: function(id, cb) {
-        var currentCheck = (new Date()).getTime();
-        var millisecondsSinceLastCheck = currentCheck - this.lastCycle;
-        if (millisecondsSinceLastCheck > this.interval)
-            this.lastCycle = currentCheck
-
-        cb(this.getTemp());
-    },
+    interval: 20000,
     temperatureSync: function(id) {
         return this.getTemp();
     },
@@ -18,7 +10,7 @@ module.exports = {
         if (millisecondsSinceLastCheck > this.interval)
             this.lastCycle = currentCheck
 
-        return 20 + Math.sin(Math.PI * 2 * millisecondsSinceLastCheck/this.interval) * 50;
+        return (20 + Math.sin(Math.PI * 2 * millisecondsSinceLastCheck/this.interval) * 2).toFixed(2);
     },
     sensors: function(cb) {
         cb(null, [0])
