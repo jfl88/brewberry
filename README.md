@@ -6,38 +6,43 @@ Look at config.json.example for explanation of what you need to configure.  Save
 
 # UML
 ## Sensor
+### Constructors
+* Sensor (id, name)
 ### Properties
-id
-name
-model (ds18b20, sineSim)
-units
-lastRecord { timestamp, temp }
-currentRecord { timestamp, temp }
+* id
+* name
+* model (eg. ds18b20, sineSim)
+* units
+* lastRecord { timestamp, temp }
+* currentRecord { timestamp, temp }
 ### Methods
-getValue
+* getValue
 
 ## Switch
+### Constructors
+
 ### Properties
-id
-name
-model
-lastSwitched
+* id
+* name
+* model
+* lastSwitched
 ### Methods
-switchOn
-switchOff
-getStatus
+* switchOn
+* switchOff
+* getStatus
 
 ## Controller
+### Constructors
 ### Properties
-name
-type (hysteresis, onoff, pwmpid)
-sensorid
-switchid
-updateRate
-param [ 
+* name
+* type (hysteresis, onoff, pwmpid)
+* sensorid
+* switchid
+* updateRate
+* param [ 
     { name: value }
     (for hysteresis: onTemp, offTemp, minOffTime)
 ]
 ### Methods
-startControl
-stopControl 
+* startControl
+* stopControl 
