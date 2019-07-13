@@ -10,6 +10,8 @@ id
 name
 model (ds18b20, sineSim)
 units
+lastRecord { timestamp, temp }
+currentRecord { timestamp, temp }
 
 getValue
 
