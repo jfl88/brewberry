@@ -1,16 +1,6 @@
-// Sub with var ds18b20 = require('./tests/mockSensor') for a sensor
-// that returns a sine wave of 50 to 150 over 100 seconds.
-if (process.env.DEVICE_ID != undefined) {
-  var ds18b20 = require('ds18b20');
-} else {
-  var ds18b20 = require('./tests/mockSensor');
-}
-
 const config = require('./config');
 
-const brewHome = process.env.BREWHOME;
 const socketServer = require('socket.io');
-const socketClient = require('socket.io-client');
 
 const webListenPort = 3000;
 
@@ -27,32 +17,26 @@ webapp.set('port', port);
 
 var server = http.createServer(webapp);
 
-try {
-  ioClient = socketClient(brewHome);
-} catch (e) {
-  console.log('Could not connect to registry')
-}
+var SineSim = require('./sensors/SineSim');
 
 var sensors = [],
-  collectInterval = 1000,
-  lastRecord = { id: process.env.DEVICE_ID },
-  currentRecord = { deviceId: process.env.DEVICE_ID };
+  collectInterval = 1000;
 
 function collectTemperatureData()
 {
-  lastRecord.temp         = currentRecord.temp;
-  lastRecord.timestamp    = currentRecord.timestamp;
-  currentRecord.temp      = ds18b20.temperatureSync(sensors[0]);
-  currentRecord.timestamp = (new Date()).getTime();
+  sensors.forEach(function (sensor) {
+    sensor.lastRecord.temp         = sensor.currentRecord.temp;
+    sensor.lastRecord.timestamp    = sensor.currentRecord.timestamp;
+    sensor.currentRecord.temp      = sensor.getValue();
+    sensor.currentRecord.timestamp = (new Date()).getTime();
+  
+    if (sensor.lastRecord.temp != sensor.currentRecord.temp) {
+      io.emit('liveTemp', sensor.currentRecord);
+    }
 
-  if (lastRecord.temp != currentRecord.temp) {
-    io.emit('liveTemp', currentRecord);
-    if (ioClient)
-      ioClient.emit('liveTemp', currentRecord);
-  }
-
-  logger.log(currentRecord)
-  return currentRecord;
+    logger.log(sensor)
+    return sensor.currentRecord;
+  });
 }
 
 /**
@@ -117,15 +101,10 @@ function onListening() {
 
 function init()
 {
-  ds18b20.sensors((err, ids) => {
-    if (err) {
-      logger.log("Error initializing sensors: " + err.message)
-      shutdown();
-    }
-    sensors = ids;
-    collectTemperatureData();
-    setInterval(collectTemperatureData, collectInterval);
-  });
+  sensors.push(new SineSim('abcd','sensor1'));
+  
+  collectTemperatureData();
+  setInterval(collectTemperatureData, collectInterval);
 
   server.listen(port);
   server.on('error', onError);

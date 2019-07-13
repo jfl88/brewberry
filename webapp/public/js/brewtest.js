@@ -50,7 +50,7 @@
             var socket = io(socket_config);
             socket.on('connect', function () { console.log('connected!'); });
             socket.on('liveTemp', function(data) { 
-            console.log('received: ' + data.toString());
+            console.log('temp: ' + data.temp + '\ntimestamp: ' + new Date(data.timestamp));
 
             $scope.$apply(function () {
               $scope.liveTemp = data.temp;
