@@ -43,10 +43,13 @@
 
           $scope.liveTemp = 0.0;
 
-          var socket = io('//localhost:4000');
-
-          socket.on('connect', function () { console.log('connected!'); });
-          socket.on('liveTemp', function(data) { 
+          // get socket config from the server, connect to socket server and create listeners
+          $http.get('/init_socket').then(function success(resp) {
+            var socket_config = '//' + resp.data.socket_addr + ':' + resp.data.socket_port;
+            
+            var socket = io(socket_config);
+            socket.on('connect', function () { console.log('connected!'); });
+            socket.on('liveTemp', function(data) { 
             console.log('received: ' + data.toString());
 
             $scope.$apply(function () {
@@ -55,6 +58,7 @@
               // put this in the new 'recordTemp' socket message once that's setup
               Plotly.extendTraces('brewGraph', { y: [[ data.temp ]], x: [[ new Date(data.timestamp) ]] }, [0]);
             });
+          });
           });
         }
     ]);

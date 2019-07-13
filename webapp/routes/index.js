@@ -5,7 +5,7 @@ var router = express.Router();
 var dblogin = require('../../config.json');
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
-var url = 'mongodb://' + dblogin.user + ':' + dblogin.pw + '@' + dblogin.addr;
+var url = 'mongodb://' + dblogin.db_user + ':' + dblogin.db_pw + '@' + dblogin.db_addr;
 
 /* GET home page. */
 router.get('/', function(req, res, next) {

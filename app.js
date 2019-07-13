@@ -7,20 +7,18 @@ if (process.env.DEVICE_ID != undefined) {
 }
 
 const config = require('./config');
-var dbConnectionString = 'mongodb://' + config.dbuser + ':' + config.dbpw + '@' + config.addr;
 
 const brewHome = process.env.BREWHOME;
 const socketServer = require('socket.io');
 const socketClient = require('socket.io-client');
 
-const ioListenPort = 4000;
 const webListenPort = 3000;
 
 const webapp = require('./webapp/app');
 const debug = require('debug')('brewtest:server');
 const http = require('http');
 
-var io = socketServer(ioListenPort);
+var io = socketServer(config.socket_port);
 var logger = require('./logger')(io);
 var ioClient;
 

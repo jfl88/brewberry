@@ -10,7 +10,7 @@ module.exports = {
         if (millisecondsSinceLastCheck > this.interval)
             this.lastCycle = currentCheck
 
-        return (20 + Math.sin(Math.PI * 2 * millisecondsSinceLastCheck/this.interval) * 2).toFixed(2);
+        return (Math.random() + 20 + Math.sin(Math.PI * 2 * millisecondsSinceLastCheck/this.interval) * 2).toFixed(2);
     },
     sensors: function(cb) {
         cb(null, [0])

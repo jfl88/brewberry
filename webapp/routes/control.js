@@ -7,7 +7,7 @@ var dblogin = require('../../config.json');
 var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectId;
 var assert = require('assert');
-var url = 'mongodb://' + dblogin.user + ':' + dblogin.pw + '@' + dblogin.addr;
+var url = 'mongodb://' + dblogin.db_user + ':' + dblogin.db_pw + '@' + dblogin.db_addr;
 
 var auth = function (req, res, next) {
   function unauthorized(res) {
