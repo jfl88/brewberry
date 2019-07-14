@@ -85,8 +85,9 @@ function onListening() {
 
 function init()
 {
-  sensors.push(new SineSim('abcd','Fridge'));
-  sensors.push(new SineSim('efgh','Room/Kettle'));
+  config.sensors.forEach(function (sensor){
+    sensors.push(new SineSim(sensor.id,sensor.name));
+  });
   
   controllers.push(new NoControl('1','my controller', sensors[0], '', 1000, []));
   controllers.push(new NoControl('2','my controller2', sensors[1], '', 1000, []));
