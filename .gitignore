@@ -57,5 +57,8 @@ typings/
 # dotenv environment variables file
 .env
 
-# database credentials
-dblogin.json
+# database credentials and setup parameters
+config.json
+
+# get rid of garbage OS files
+.DS_Store

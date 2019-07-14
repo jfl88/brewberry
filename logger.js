@@ -1,9 +1,6 @@
-module.exports = function(io) {
-  return {
-    log: function(message) {
-      if (io)
-        io.emit('log', message)
-      console.log(message)
-    }
-  }
-}
+const EventEmitter = require('events');
+class Logger extends EventEmitter {
+
+};
+var logger = new Logger();
+module.exports = logger;

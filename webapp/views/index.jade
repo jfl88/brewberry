@@ -1,0 +1,37 @@
+extends layout
+
+block content
+  div(ng-controller='homeCtrl', class='container')
+    .row
+      .col-md-12
+        h2=title
+        hr
+    .row
+      .col-sm-9.col-md-6
+        .panel.panel-default
+          .panel-heading
+            label Current Brew
+          .panel-body
+            p
+              label Name:&nbsp
+              a(href='{{ currentBrew.recipeUrl }}') {{ currentBrew.name }}
+            p
+              label Stage:
+              &nbsp Fermentation (started {{ currentBrew.startDT | date }})
+            p
+              label Last Recorded Temp:
+              &nbsp {{ brewData[0].y[brewData[0].y.length - 1] }} at {{ brewData[0].x[brewData[0].x.length - 1].toString() }}
+      .col-sm-3.col-md-6
+        .panel.panel-default
+          .panel-heading
+            label Live Temp
+          .panel-body
+            h2(ng-repeat="temp in liveTemp")
+              {{ temp.name }}: {{ temp.currentRecord.temp }}°C ({{ ((temp.currentRecord.temp * 9) / 5) + 32 | number:1 }}°F)
+    .row
+      .col-md-12
+        .panel.panel-default
+          .panel-heading
+            label Brew Temperature (Last 24 Hours)
+          .panel-body
+            div(id='brewGraph')

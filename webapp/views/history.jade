@@ -1,0 +1,26 @@
+extends layout
+
+block content
+  div(ng-controller='historyCtrl', class='container')
+    .row
+      .col-md-12
+        h2=title
+          span.pull-right
+            a(href='/control/brew/') New Brew
+        hr
+    for brew in brews    
+      .row(name=brew._id)
+        .col-sm-12
+          .panel.panel-default
+            .panel-heading
+              label #{brew.name}
+              span.pull-right
+                a(href='/control/brew/' + brew._id) Edit Brew
+            .panel-body
+              p
+                label Recipe:&nbsp
+                a(href=brew.recipeUrl) #{brew.name}
+              p
+                label Stage:
+                &nbspFermentation (started #{brew.startDT})
+              div(id=brew._id)
