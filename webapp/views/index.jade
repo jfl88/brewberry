@@ -26,10 +26,8 @@ block content
           .panel-heading
             label Live Temp
           .panel-body
-            h1
-              {{ liveTemp }}°C 
-            h3
-              {{ ((liveTemp * 9) / 5) + 32 | number:1 }}°F
+            h2(ng-repeat="temp in liveTemp")
+              {{ temp.name }}: {{ temp.currentRecord.temp }}°C ({{ ((temp.currentRecord.temp * 9) / 5) + 32 | number:1 }}°F)
     .row
       .col-md-12
         .panel.panel-default

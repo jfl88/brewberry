@@ -9,7 +9,7 @@ const debug = require('debug')('brewtest:server');
 const http = require('http');
 
 var io = socketServer(config.socket_port);
-var logger = require('./logger')(io);
+var logger = require('./logger');
 var ioClient;
 
 var port = normalizePort(process.env.PORT || webListenPort);
@@ -17,26 +17,11 @@ webapp.set('port', port);
 
 var server = http.createServer(webapp);
 
-var SineSim = require('./sensors/SineSim');
+const SineSim = require('./sensors/sinesim');
+const NoControl = require('./controllers/nocontrol');
 
-var sensors = [],
-  collectInterval = 1000;
-
-function collectTemperatureData()
-{
-  sensors.forEach(function (sensor) {
-    sensor.lastRecord.temp         = sensor.currentRecord.temp;
-    sensor.lastRecord.timestamp    = sensor.currentRecord.timestamp;
-    sensor.currentRecord.temp      = sensor.getValue();
-    sensor.currentRecord.timestamp = (new Date()).getTime();
-  
-    if (sensor.lastRecord.temp != sensor.currentRecord.temp) {
-      io.emit('liveTemp', sensor);
-    }
-
-    logger.log(sensor)
-  });
-}
+var sensors = [];
+var controllers = [];
 
 /**
  * Normalize a port into a number, string, or false.
@@ -100,11 +85,24 @@ function onListening() {
 
 function init()
 {
-  sensors.push(new SineSim('abcd','sensor1'));
-  sensors.push(new SineSim('efgh','sensor2'));
+  sensors.push(new SineSim('abcd','Fridge'));
+  sensors.push(new SineSim('efgh','Room/Kettle'));
   
-  collectTemperatureData();
-  setInterval(collectTemperatureData, collectInterval);
+  controllers.push(new NoControl('1','my controller', sensors[0], '', 1000, []));
+  controllers.push(new NoControl('2','my controller2', sensors[1], '', 1000, []));
+  
+  controllers.forEach(function (controller) {
+    if (controller.startControl())
+      console.log('started controller: ' + controller.name);
+    else
+      console.log('failed to start controller: ' + controller.name);
+  });
+
+  logger.on('controllerUpdate', function(controllerName, sensorData){
+    console.log('Controller: ' + controllerName);
+    console.log(sensorData);
+    io.emit('liveTemp', sensorData);
+  });
 
   server.listen(port);
   server.on('error', onError);
@@ -112,7 +110,14 @@ function init()
 }
 
 function shutdown() {
-  logger.log('Shutting down');
+  console.log('shutting down controllers');
+  controllers.forEach(function(controller) { 
+    if (!controller.stopControl())
+      console.log('shutdown controller: ' + controller.name);
+    else
+      console.log('failed to stop controller: ' + controller.name);
+  });
+  console.log('closing sockets');
   io.close();
   if (ioClient)
     ioClient.close();

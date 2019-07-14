@@ -30,7 +30,7 @@ app.use('/users', users);
 app.use('/history', history);
 app.use('/control', control);
 
-app.use('/init_socket',function (req, res) {
+app.use('/init',function (req, res) {
   res.json({
     "socket_addr": config.socket_addr,
     "socket_port": config.socket_port

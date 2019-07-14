@@ -1,29 +1,32 @@
-function SineSim (id, name) {
-    // standard members
-    this.id = id;
-    this.name = name;
-    this.model = "SineSim";
-    this.units = "°C";
+class SineSim {
 
-    this.lastRecord = {};
-    this.currentRecord = {};
+    constructor (id, name) {
+        // standard members
+        this.id = id;
+        this.name = name;
+        this.model = "SineSim";
+        this.units = "°C";
 
-    // sineSim only
-    this.lastCycle = (new Date()).getTime();
-    this.interval = 50000 * Math.random();
+        this.lastRecord = {};
+        this.currentRecord = {};
+
+        // sineSim only
+        this.lastCycle = (new Date()).getTime();
+        this.interval = 50000 * Math.random();
+    }
+
+    getValue() {
+        var randomnum = Math.random();
+        var currentCheck = (new Date()).getTime();
+        var millisecondsSinceLastCheck = currentCheck - this.lastCycle;
+        if (millisecondsSinceLastCheck > this.interval)
+            this.lastCycle = currentCheck
+    
+        if (randomnum > 0.5)
+            return (randomnum + 20 + Math.sin(Math.PI * 2 * millisecondsSinceLastCheck/this.interval) * 2).toFixed(2);
+        else
+            return this.lastRecord.temp;
+    }
 }
-
-SineSim.prototype.getValue = function () {
-    var randomnum = Math.random();
-    var currentCheck = (new Date()).getTime();
-    var millisecondsSinceLastCheck = currentCheck - this.lastCycle;
-    if (millisecondsSinceLastCheck > this.interval)
-        this.lastCycle = currentCheck
-
-    if (randomnum > 0.5)
-        return (randomnum + 20 + Math.sin(Math.PI * 2 * millisecondsSinceLastCheck/this.interval) * 2).toFixed(2);
-    else
-        return this.lastRecord.temp;
-};
 
 module.exports = SineSim;

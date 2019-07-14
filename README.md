@@ -25,6 +25,7 @@ Look at config.json.example for explanation of what you need to configure.  Save
 * id
 * name
 * model
+* state (0 - off, 1 - on)
 * lastSwitched
 ### Methods
 * switchOn
