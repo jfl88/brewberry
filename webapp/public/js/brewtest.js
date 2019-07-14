@@ -15,7 +15,13 @@
                 $scope.brewData = [{
                     x: [],
                     y: [],
-                    type: 'scatter'
+                    type: 'scatter',
+                    name: 'sensor1',
+                }, {
+                    x: [],
+                    y: [],
+                    type: 'scatter',
+                    name: 'sensor2',
                 }];
     
                 var layout = {
@@ -31,12 +37,12 @@
                     }
                 };
     
-                $scope.temps.forEach(function(record) {
+                /* $scope.temps.forEach(function(record) {
                     if (new Date(record.timestamp) > new Date(new Date().getTime() - (24 * 60 * 60 * 1000))) {
                         $scope.brewData[0].x.push(new Date(record.timestamp));
                         $scope.brewData[0].y.push(record.temp);
                     }
-                });
+                }); */
 
                 Plotly.newPlot('brewGraph', $scope.brewData, layout, { displaylogo: false });
             });
@@ -50,13 +56,18 @@
             var socket = io(socket_config);
             socket.on('connect', function () { console.log('connected!'); });
             socket.on('liveTemp', function(data) { 
-            console.log('temp: ' + data.temp + '\ntimestamp: ' + new Date(data.timestamp));
+            console.log(data);
 
             $scope.$apply(function () {
-              $scope.liveTemp = data.temp;
+              $scope.liveTemp = data.currentRecord.temp;
               // for now update the 24 hour graph every time receiving a new 'live' temp
               // put this in the new 'recordTemp' socket message once that's setup
-              Plotly.extendTraces('brewGraph', { y: [[ data.temp ]], x: [[ new Date(data.timestamp) ]] }, [0]);
+              var chartIndex = $scope.brewData.findIndex(function(element){
+                return element.name === data.name;
+              });
+              console.log(chartIndex);
+
+              Plotly.extendTraces('brewGraph', { y: [[ data.currentRecord.temp ]], x: [[ new Date(data.currentRecord.timestamp) ]] }, [chartIndex]);
             });
           });
           });

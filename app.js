@@ -31,11 +31,10 @@ function collectTemperatureData()
     sensor.currentRecord.timestamp = (new Date()).getTime();
   
     if (sensor.lastRecord.temp != sensor.currentRecord.temp) {
-      io.emit('liveTemp', sensor.currentRecord);
+      io.emit('liveTemp', sensor);
     }
 
     logger.log(sensor)
-    return sensor.currentRecord;
   });
 }
 
@@ -102,6 +101,7 @@ function onListening() {
 function init()
 {
   sensors.push(new SineSim('abcd','sensor1'));
+  sensors.push(new SineSim('efgh','sensor2'));
   
   collectTemperatureData();
   setInterval(collectTemperatureData, collectInterval);

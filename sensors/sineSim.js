@@ -10,16 +10,16 @@ function SineSim (id, name) {
 
     // sineSim only
     this.lastCycle = (new Date()).getTime();
-    this.interval = 50000;
+    this.interval = 50000 * Math.random();
 }
 
 SineSim.prototype.getValue = function () {
+    var randomnum = Math.random();
     var currentCheck = (new Date()).getTime();
     var millisecondsSinceLastCheck = currentCheck - this.lastCycle;
     if (millisecondsSinceLastCheck > this.interval)
         this.lastCycle = currentCheck
 
-    var randomnum = Math.random();
     if (randomnum > 0.5)
         return (randomnum + 20 + Math.sin(Math.PI * 2 * millisecondsSinceLastCheck/this.interval) * 2).toFixed(2);
     else
