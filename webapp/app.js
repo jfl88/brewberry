@@ -33,7 +33,8 @@ app.use('/control', control);
 app.use('/init',function (req, res) {
   res.json({
     "socket_addr": config.socket_addr,
-    "socket_port": config.socket_port
+    "socket_port": config.socket_port,
+    "controllers": config.controllers
   });
 });
 

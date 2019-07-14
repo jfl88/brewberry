@@ -19,7 +19,6 @@ var server = http.createServer(webapp);
 
 const Controller = require('./controllers/controller');
 
-var sensors = [];
 var controllers = [];
 
 /**
@@ -87,8 +86,6 @@ function init()
   config.controllers.forEach(function (controller){
     controllers.push(Controller.newController(controller));
   });
-
-  console.log(sensors);
   
   controllers.forEach(function (controller) {
     if (controller.startControl())
@@ -97,10 +94,9 @@ function init()
       console.log('failed to start controller: ' + controller.name);
   });
 
-  logger.on('controllerUpdate', function(controllerName, sensorData){
-    console.log('Controller: ' + controllerName);
-    console.log(sensorData);
-    io.emit('liveTemp', sensorData);
+  logger.on('controllerUpdate', function(controller){
+    console.log(controller);
+    io.emit('liveTemp', controller);
   });
 
   server.listen(port);
