@@ -17,8 +17,7 @@ webapp.set('port', port);
 
 var server = http.createServer(webapp);
 
-const SineSim = require('./sensors/sinesim');
-const NoControl = require('./controllers/nocontrol');
+const Controller = require('./controllers/controller');
 
 var sensors = [];
 var controllers = [];
@@ -85,12 +84,11 @@ function onListening() {
 
 function init()
 {
-  config.sensors.forEach(function (sensor){
-    sensors.push(new SineSim(sensor.id,sensor.name));
+  config.controllers.forEach(function (controller){
+    controllers.push(Controller.newController(controller));
   });
-  
-  controllers.push(new NoControl('1','my controller', sensors[0], '', 1000, []));
-  controllers.push(new NoControl('2','my controller2', sensors[1], '', 1000, []));
+
+  console.log(sensors);
   
   controllers.forEach(function (controller) {
     if (controller.startControl())
@@ -112,11 +110,10 @@ function init()
 
 function shutdown() {
   console.log('shutting down controllers');
-  controllers.forEach(function(controller) { 
-    if (!controller.stopControl())
-      console.log('shutdown controller: ' + controller.name);
-    else
-      console.log('failed to stop controller: ' + controller.name);
+  controllers.forEach(function(controller) {
+    if (controller.runningState)
+      if (controller.stopControl())
+        console.log('failed to stop controller: ' + controller.name); 
   });
   console.log('closing sockets');
   io.close();
