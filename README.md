@@ -6,9 +6,8 @@ Look at config.json.example for explanation of what you need to configure.  Save
 
 # Stuff to develop
 ## Short term
-* Tidy up config (and live temp display) to be based around controllers
 * Finish Hysteresis controller, including output display
-* Create a ds18b20 sensor module
+* split out javascript lib to mins, ensure socket.io client is uptodate
 
 ## Long term
 * create a TPLink socket switch module

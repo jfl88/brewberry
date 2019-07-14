@@ -83,36 +83,40 @@ function onListening() {
 
 function init()
 {
-  config.controllers.forEach(function (controller){
-    controllers.push(Controller.newController(controller));
-  });
-  
-  controllers.forEach(function (controller) {
-    if (controller.startControl())
-      console.log('started controller: ' + controller.name);
-    else
-      console.log('failed to start controller: ' + controller.name);
-  });
+  if (!config.client_only) {
+    config.controllers.forEach(function (controller){
+      controllers.push(Controller.newController(controller));
+    });
+    
+    controllers.forEach(function (controller) {
+      if (controller.startControl())
+        console.log('started controller: ' + controller.name);
+      else
+        console.log('failed to start controller: ' + controller.name);
+    });
 
-  logger.on('controllerUpdate', function(controller){
-    console.log(controller);
-    io.emit('liveTemp', controller);
-  });
-
+    logger.on('controllerUpdate', function(controller){
+      console.log(controller);
+      io.emit('liveTemp', controller);
+    });
+  }
   server.listen(port);
   server.on('error', onError);
   server.on('listening', onListening);
 }
 
 function shutdown() {
-  console.log('shutting down controllers');
-  controllers.forEach(function(controller) {
-    if (controller.runningState)
-      if (controller.stopControl())
-        console.log('failed to stop controller: ' + controller.name); 
-  });
-  console.log('closing sockets');
-  io.close();
+  if (!config.client_only) {
+    console.log('shutting down controllers');
+    controllers.forEach(function(controller) {
+      if (controller.runningState)
+        if (controller.stopControl())
+          console.log('failed to stop controller: ' + controller.name); 
+    });
+    
+    console.log('closing sockets');
+    io.close();
+  }
   if (ioClient)
     ioClient.close();
   process.exit(2);
