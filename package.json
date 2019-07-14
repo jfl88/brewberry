@@ -4,6 +4,7 @@
   "description": "Records temperature to a MongoDB and runs a websocket server for live temperature.",
   "main": "app.js",
   "scripts": {
+    "start": "node ./app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
