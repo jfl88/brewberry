@@ -1,7 +1,7 @@
 const SineSim = require('./sinesim');
 const ds18b20 = require('./ds18b20');
 
-class Sensor{
+class Sensor {
     static newSensor(sensor){
         switch (sensor.model){
             case 'SineSim':

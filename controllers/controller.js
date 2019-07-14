@@ -2,7 +2,7 @@ const Hysteresis = require('./hysteresis');
 const ReadOnly = require('./readonly');
 const Sensor = require('../sensors/sensor');
 
-class Controller{
+class Controller {
     static newController(controller){
         switch (controller.model){
             case 'ReadOnly':
