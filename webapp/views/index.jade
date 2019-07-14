@@ -27,7 +27,7 @@ block content
             label Live Temp
           .panel-body
             h2(ng-repeat="temp in liveTemp")
-              {{ temp.name }}: {{ temp.currentRecord.temp }}°C ({{ ((temp.currentRecord.temp * 9) / 5) + 32 | number:1 }}°F)
+              {{ temp.name }}: {{ temp.sensor.currentRecord.temp + temp.sensor.units}} ({{ ((temp.sensor.currentRecord.temp * 9) / 5) + 32 | number:1 }}°F)
     .row
       .col-md-12
         .panel.panel-default

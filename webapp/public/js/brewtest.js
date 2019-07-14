@@ -43,18 +43,15 @@
             $http.get('/init').then(function success(resp) {
                 var socket_config = '//' + resp.data.socket_addr + ':' + resp.data.socket_port;
             
-                $scope.brewData.push({
-                    x: [],
-                    y: [],
-                    type: 'scatter',
-                    name: 'Fridge',
+                resp.data.controllers.forEach(function(controller) {
+                    $scope.brewData.push({
+                        x: [],
+                        y: [],
+                        type: 'scatter',
+                        name: controller.name,
+                    });
                 });
-                $scope.brewData.push({
-                    x: [],
-                    y: [],
-                    type: 'scatter',
-                    name: 'Room/Kettle',
-                });
+                
 
                 console.log($scope.brewData);
 
@@ -71,7 +68,7 @@
                         });
                         $scope.liveTemp[chartIndex] = data;
 
-                        Plotly.extendTraces('brewGraph', { y: [[ data.currentRecord.temp ]], x: [[ new Date(data.currentRecord.timestamp) ]] }, [chartIndex]);
+                        Plotly.extendTraces('brewGraph', { y: [[ data.sensor.currentRecord.temp ]], x: [[ new Date(data.sensor.currentRecord.timestamp) ]] }, [chartIndex]);
                     });
                 });
             });
