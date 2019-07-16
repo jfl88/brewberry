@@ -12,7 +12,7 @@ class SineSim {
 
         // sineSim only
         this.lastCycle = (new Date()).getTime();
-        this.interval = 50000 * Math.random();
+        this.interval = 25000;//50000 * Math.random();
     }
 
     getValue() {

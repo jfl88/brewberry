@@ -96,7 +96,7 @@ function init()
     });
 
     logger.on('controllerUpdate', function(controller){
-      console.log(controller);
+      //console.log(controller);
       io.emit('liveTemp', controller);
     });
   }
