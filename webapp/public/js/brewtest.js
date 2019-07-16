@@ -7,6 +7,28 @@
         function ($scope, $http) {
             $scope.brewData = [];
 
+            var layout = {
+                showlegend: false,
+                xaxis: { title: 'Date / Time', type: 'date' },
+                yaxis: { title: 'Temperature (°C)', nticks: 10 },
+                yaxis2: {
+                    title: 'Output Status',
+                    nticks: 2,
+                    range: [ 0, 1 ],
+                    overlaying: 'y',
+                    side: 'right'
+                },
+                margin: {
+                    l: 50,
+                    r: 50,
+                    b: 50,
+                    t: 50,
+                    pad: 4
+                }
+            };
+
+            Plotly.newPlot('brewGraph', $scope.brewData, layout, { displaylogo: false, responsive: true });
+
             $scope.liveTemp = [{},{}];
 
             $http.get('/api/currentbrew').then(function success(resp) {
@@ -16,33 +38,12 @@
             $http.get('/api/gettemps').then(function success(resp) {
                 $scope.temps = resp.data
     
-                var layout = {
-                    showlegend: false,
-                    xaxis: { title: 'Date / Time', type: 'date' },
-                    yaxis: { title: 'Temperature (°C)', nticks: 10 },
-                    yaxis2: {
-                        title: 'Output Status',
-                        nticks: 2,
-                        overlaying: 'y',
-                        side: 'right'
-                    },
-                    margin: {
-                        l: 50,
-                        r: 50,
-                        b: 50,
-                        t: 50,
-                        pad: 4
-                    }
-                };
-    
                 /* $scope.temps.forEach(function(record) {
                     if (new Date(record.timestamp) > new Date(new Date().getTime() - (24 * 60 * 60 * 1000))) {
                         $scope.brewData[0].x.push(new Date(record.timestamp));
                         $scope.brewData[0].y.push(record.temp);
                     }
                 }); */  
-
-                Plotly.newPlot('brewGraph', $scope.brewData, layout, { displaylogo: false, responsive: true });
             });
 
             // get socket config from the server, connect to socket server and create listeners
