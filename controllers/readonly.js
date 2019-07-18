@@ -26,7 +26,7 @@ class ReadOnly {
             this.sensor.lastRecord.temp         = this.sensor.currentRecord.temp;
             this.sensor.lastRecord.timestamp    = this.sensor.currentRecord.timestamp;
             this.sensor.currentRecord.temp      = newTemp;
-            this.sensor.currentRecord.timestamp = (new Date()).getTime();
+            this.sensor.currentRecord.timestamp = new Date();
         
             if (this.sensor.lastRecord.temp != this.sensor.currentRecord.temp) {
                 logger.emit('controllerUpdate', this);

@@ -44,7 +44,7 @@
                         var timestamps = [], sensorValues = [], outputValues = [];
 
                         controller.logs.forEach(function (log) {
-                            timestamps.push(log.timestamp);
+                            timestamps.push(new Date(log.timestamp));
                             sensorValues.push(log.sensorValue);
                             outputValues.push(log.outputValue);
                         });

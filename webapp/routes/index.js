@@ -27,30 +27,30 @@ router.route('/api/currentbrew')
   });
 
 router.route('/api/getlogs')
-.get(function(req, res, next) {
-  yesterday = new Date().getTime() - (24 * 60 * 60 * 1000);
-// add pulling the controller configuration and then adding temp history to it
-  var results = [];
-  config.controllers.forEach(function (controller) {
-    MongoClient.connect(url, function(err, db){
-      db.collection('controllerLog')
-      .find({
-        timestamp: {
-          $gte: yesterday
-        },
-        id: controller.id
-      })
-      .toArray(function(err, docs) {
-        assert.equal(err, null);
-        controller.logs = docs;
-      });      
+  .get(function(req, res, next) {
+    yesterday = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
+  // add pulling the controller configuration and then adding temp history to it
+    var results = [];
+    config.controllers.forEach(function (controller) {
+      MongoClient.connect(url, function(err, db){
+        db.collection('controllerLog')
+        .find({
+          timestamp: {
+            $gte: yesterday
+          },
+          id: controller.id
+        })
+        .toArray(function(err, docs) {
+          assert.equal(err, null);
+          controller.logs = docs;
+        });      
+      });
+
+      results.push(controller);
     });
 
-    results.push(controller);
+    res.json(results);
   });
-
-  res.json(results);
-});
 
 router.route('/api/brews')
   .get(function(req, res, next) {

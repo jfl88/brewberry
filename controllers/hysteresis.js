@@ -25,7 +25,7 @@ class Hysteresis {
             this.sensor.lastRecord.temp         = this.sensor.currentRecord.temp;
             this.sensor.lastRecord.timestamp    = this.sensor.currentRecord.timestamp;
             this.sensor.currentRecord.temp      = newTemp;
-            this.sensor.currentRecord.timestamp = (new Date()).getTime();
+            this.sensor.currentRecord.timestamp = new Date();
         
             if (this.sensor.lastRecord.temp != this.sensor.currentRecord.temp) {
                 if (!this.output.state && this.sensor.currentRecord.temp > (this.param.setpoint + this.param.onDeadband) && (this.output.lastSwitched + this.param.minOffTime * 1000) < this.sensor.currentRecord.timestamp)
