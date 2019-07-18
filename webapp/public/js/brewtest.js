@@ -27,68 +27,67 @@
                 }
             };
 
-            Plotly.newPlot('brewGraph', $scope.brewData, layout, { displaylogo: false, responsive: true });
-
             $scope.liveTemp = [{},{}];
 
             $http.get('/api/currentbrew').then(function success(resp) {
                 $scope.currentBrew = resp.data[0];
             });
 
-            $http.get('/api/gettemps').then(function success(resp) {
-                $scope.temps = resp.data
-    
-                /* $scope.temps.forEach(function(record) {
-                    if (new Date(record.timestamp) > new Date(new Date().getTime() - (24 * 60 * 60 * 1000))) {
-                        $scope.brewData[0].x.push(new Date(record.timestamp));
-                        $scope.brewData[0].y.push(record.temp);
-                    }
-                }); */  
-            });
-
             // get socket config from the server, connect to socket server and create listeners
             $http.get('/init').then(function success(resp) {
                 var socket_config = '//' + resp.data.socket_addr + ':' + resp.data.socket_port;
-            
-                resp.data.controllers.forEach(function(controller) {
-                    $scope.brewData.push({
-                        x: [],
-                        y: [],
-                        type: 'scatter',
-                        name: controller.name + " " + controller.sensor.name,
-                    });
-
-                    if (controller.output)
-                        $scope.brewData.push({
-                            x: [],
-                            y: [],
-                            type: 'scatter',
-                            yaxis: 'y2',
-                            name: controller.name + " " + controller.output.name,
-                        });
-                });
                 
+                $http.get('/api/getlogs').then(function success(resp) {
+                    $scope.logs = resp.data
+                    
+                    $scope.logs.forEach(function(controller) {
+                        var timestamps = [], sensorValues = [], outputValues = [];
+
+                        controller.logs.forEach(function (log) {
+                            timestamps.push(log.timestamp);
+                            sensorValues.push(log.sensorValue);
+                            outputValues.push(log.outputValue);
+                        });
+                        
+                        $scope.brewData.push({
+                            x: timestamps,
+                            y: sensorValues,
+                            type: 'scatter',
+                            name: controller.name + " " + controller.sensor.name,
+                        });
+    
+                        if (controller.output)
+                            $scope.brewData.push({
+                                x: timestamps,
+                                y: outputValues,
+                                type: 'scatter',
+                                yaxis: 'y2',
+                                name: controller.name + " " + controller.output.name,
+                            });
+                        });
+
+                    Plotly.newPlot('brewGraph', $scope.brewData, layout, { displaylogo: false, responsive: true });
+                });
 
                 console.log($scope.brewData);
 
                 var socket = io(socket_config);
                 socket.on('connect', function () { console.log('connected!'); });
                 socket.on('liveTemp', function(data) { 
-                    console.log($scope.brewData);
+                    if ($scope.brewData.length > 0)
+                        $scope.$apply(function () {
+                            // for now update the 24 hour graph every time receiving a new 'live' temp
+                            // put this in the new 'recordTemp' socket message once that's setup
+                            var chartIndex = $scope.brewData.findIndex(function(element){
+                                return element.name === (data.name + " " + data.sensor.name);
+                            });
+                            $scope.liveTemp[chartIndex] = data;
 
-                    $scope.$apply(function () {
-                        // for now update the 24 hour graph every time receiving a new 'live' temp
-                        // put this in the new 'recordTemp' socket message once that's setup
-                        var chartIndex = $scope.brewData.findIndex(function(element){
-                            return element.name === (data.name + " " + data.sensor.name);
+                            Plotly.extendTraces('brewGraph', { y: [[ data.sensor.currentRecord.temp ]], x: [[ new Date(data.sensor.currentRecord.timestamp) ]] }, [chartIndex]);
+
+                            if (data.output)
+                                Plotly.extendTraces('brewGraph', { y: [[ data.output.state ]], x: [[ new Date() ]] }, [chartIndex + 1]);
                         });
-                        $scope.liveTemp[chartIndex] = data;
-
-                        Plotly.extendTraces('brewGraph', { y: [[ data.sensor.currentRecord.temp ]], x: [[ new Date(data.sensor.currentRecord.timestamp) ]] }, [chartIndex]);
-
-                        if (data.output)
-                            Plotly.extendTraces('brewGraph', { y: [[ data.output.state ]], x: [[ new Date() ]] }, [chartIndex + 1]);
-                    });
                 });
             });
         }
