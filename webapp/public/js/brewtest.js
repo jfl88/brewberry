@@ -47,7 +47,8 @@
                             timestamps.push(new Date(log.timestamp));
                             sensorValues.push(log.sensorValue);
                             outputValues.push(log.outputValue);
-                            if (idx === ary.length -1) {
+                            if (idx === ary.length - 1) {
+                                controller.sensor.currentRecord = {};
                                 controller.sensor.currentRecord.timestamp = log.timestamp;
                                 controller.sensor.currentRecord.temp = log.sensorValue;
                             }
