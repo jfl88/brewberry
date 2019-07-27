@@ -94,6 +94,12 @@
 
                             if (data.output)
                                 Plotly.extendTraces('brewGraph', { y: [[ data.output.state ]], x: [[ new Date() ]] }, [chartIndex + 1]);
+
+                            chartIndex = $scope.liveTemp.findIndex(function (element) {
+                                return element.name === data.name;
+                            });
+
+                            $scope.liveTemp[chartIndex] = data;
                         });
                 });
             });
