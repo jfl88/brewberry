@@ -63,8 +63,10 @@
                                 type: 'scatter',
                                 yaxis: 'y2',
                                 name: controller.name + " " + controller.output.name,
-                            });
                         });
+                        
+                        $scope.liveTemp.push(controller);
+                    });
 
                     Plotly.newPlot('brewGraph', $scope.brewData, layout, { displaylogo: false, responsive: true });
                 });
