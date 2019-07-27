@@ -27,7 +27,7 @@
                 }
             };
 
-            $scope.liveTemp = [{},{}];
+            $scope.liveTemp = [];
 
             $http.get('/api/currentbrew').then(function success(resp) {
                 $scope.currentBrew = resp.data[0];
