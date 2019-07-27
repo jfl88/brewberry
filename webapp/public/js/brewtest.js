@@ -43,10 +43,14 @@
                     $scope.logs.forEach(function(controller) {
                         var timestamps = [], sensorValues = [], outputValues = [];
 
-                        controller.logs.forEach(function (log) {
+                        controller.logs.forEach(function (log, idx, ary) {
                             timestamps.push(new Date(log.timestamp));
                             sensorValues.push(log.sensorValue);
                             outputValues.push(log.outputValue);
+                            if (idx === ary.length -1) {
+                                controller.sensor.currentRecord.timestamp = log.timestamp;
+                                controller.sensor.currentRecord.temp = log.sensorValue;
+                            }
                         });
                         
                         $scope.brewData.push({
