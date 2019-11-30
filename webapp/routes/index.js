@@ -40,6 +40,7 @@ router.route('/api/getlogs')
           },
           id: controller.id
         })
+        .sort({ timestamp: 1 })
         .toArray(function(err, docs) {
           assert.equal(err, null);
           controller.logs = docs;
