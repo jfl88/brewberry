@@ -7,7 +7,7 @@ block content
         h2=title
         hr
     .row
-      .col-md-6
+      .col-sm-6.col-md-6
         .panel.panel-default
           .panel-heading
             label Current Brew
@@ -21,12 +21,12 @@ block content
             p
               label Last Recorded Temp:
               &nbsp {{ brewData[0].y[brewData[0].y.length - 1] }} at {{ brewData[0].x[brewData[0].x.length - 1].toString() }}
-      .col-md-6
+      .col-sm-6.col-md-6
         .panel.panel-default
           .panel-heading
             label Live Temp
           .panel-body
-            h2(ng-repeat="temp in liveTemp")
+            h3(ng-repeat="temp in liveTemp")
               {{ temp.name }}: {{ temp.sensor.currentRecord.temp + temp.sensor.units}} ({{ ((temp.sensor.currentRecord.temp * 9) / 5) + 32 | number:1 }}°F)
     .row
       .col-md-12
