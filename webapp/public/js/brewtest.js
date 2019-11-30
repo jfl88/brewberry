@@ -1,6 +1,16 @@
 (function (){
     'use strict';
 
+    window.chartColors = [
+        'rgb(54, 162, 235)',
+        'rgb(255, 99, 132)',
+        'rgb(255, 205, 86)',
+        'rgb(75, 192, 192)',
+        'rgb(255, 159, 64)',
+        'rgb(153, 102, 255)',
+        'rgb(201, 203, 207)'
+    ];
+
     angular
         .module('brewtest', ['nvd3'])
         .controller('homeCtrl', ['$scope', '$http',
@@ -40,13 +50,32 @@
                 $http.get('/api/getlogs').then(function success(resp) {
                     $scope.logs = resp.data
                     
-                    $scope.logs.forEach(function(controller) {
+                    $scope.brewData = {
+                        datasets: [],
+                    }
+
+                    $scope.logs.forEach(function(controller, idx, ary) {
                         var timestamps = [], sensorValues = [], outputValues = [];
+
+                        var dataset = {
+                            label: controller.name,
+                            fill: false,
+                            pointRadius: 0,
+                            backgroundColor: window.chartColors[idx % window.chartColors.length],
+                            borderColor: window.chartColors[idx % window.chartColors.length],
+                            data: []
+                        }
 
                         controller.logs.forEach(function (log, idx, ary) {
                             timestamps.push(new Date(log.timestamp));
                             sensorValues.push(log.sensorValue);
                             outputValues.push(log.outputValue);
+
+                            dataset.data.push({
+                                x: new Date(log.timestamp),
+                                y: log.sensorValue
+                            })
+
                             if (idx === ary.length - 1) {
                                 controller.sensor.currentRecord = {};
                                 controller.sensor.currentRecord.timestamp = log.timestamp;
@@ -54,26 +83,44 @@
                             }
                         });
                         
-                        $scope.brewData.push({
-                            x: timestamps,
-                            y: sensorValues,
-                            type: 'scatter',
-                            name: controller.name + " " + controller.sensor.name,
-                        });
+                        $scope.brewData.datasets.push(dataset);
+                        console.log(dataset);
+                        // $scope.brewData.push({
+                        //     x: timestamps,
+                        //     y: sensorValues
+                        // });
     
-                        if (controller.output)
-                            $scope.brewData.push({
-                                x: timestamps,
-                                y: outputValues,
-                                type: 'scatter',
-                                yaxis: 'y2',
-                                name: controller.name + " " + controller.output.name,
-                        });
+                        // if (controller.output)
+                        //     $scope.brewData.push({
+                        //         x: timestamps,
+                        //         y: outputValues,
+                        // });
                         
                         $scope.liveTemp.push(controller);
                     });
 
-                    Plotly.newPlot('brewGraph', $scope.brewData, layout, { displaylogo: false, responsive: true });
+                    var chartConfig = {
+                        type: 'line',
+                        data: $scope.brewData,
+                        options: {
+                            scales: {
+                                xAxes: [{
+                                    type: 'time'
+                                }],
+                                yAxes: [{
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'Temperature'
+                                    }
+                                }]
+                            }
+                        }
+
+                    }
+
+                    var ctx = document.getElementById('brewGraph').getContext('2d');
+                    var brewGraph = new Chart(ctx, chartConfig)
+                    // Plotly.newPlot('brewGraph', $scope.brewData, layout, { displaylogo: false, responsive: true });
                 });
 
                 console.log($scope.brewData);
@@ -90,10 +137,10 @@
                             });
                             $scope.liveTemp[chartIndex] = data;
 
-                            Plotly.extendTraces('brewGraph', { y: [[ data.sensor.currentRecord.temp ]], x: [[ new Date(data.sensor.currentRecord.timestamp) ]] }, [chartIndex]);
+                            // Plotly.extendTraces('brewGraph', { y: [[ data.sensor.currentRecord.temp ]], x: [[ new Date(data.sensor.currentRecord.timestamp) ]] }, [chartIndex]);
 
-                            if (data.output)
-                                Plotly.extendTraces('brewGraph', { y: [[ data.output.state ]], x: [[ new Date() ]] }, [chartIndex + 1]);
+                            // if (data.output)
+                            //     Plotly.extendTraces('brewGraph', { y: [[ data.output.state ]], x: [[ new Date() ]] }, [chartIndex + 1]);
 
                             chartIndex = $scope.liveTemp.findIndex(function (element) {
                                 return element.name === data.name;
