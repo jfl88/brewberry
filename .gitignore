@@ -58,7 +58,7 @@ typings/
 .env
 
 # database credentials and setup parameters
-config.json
+*config.json
 
 # get rid of garbage OS files
 .DS_Store
