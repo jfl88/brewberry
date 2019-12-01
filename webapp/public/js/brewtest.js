@@ -134,7 +134,7 @@
                         $scope.$apply(function () {
                             // for now update the 24 hour graph every time receiving a new 'live' temp
                             // put this in the new 'recordTemp' socket message once that's setup
-                            var chartIndex = $scope.brewData.findIndex(function(element){
+                            var chartIndex = $scope.brewData.datasets.findIndex(function(element){
                                 return element.name === (data.name + " " + data.sensor.name);
                             });
                             $scope.liveTemp[chartIndex] = data;
