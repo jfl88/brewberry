@@ -15,8 +15,6 @@
         .module('brewtest', ['nvd3'])
         .controller('homeCtrl', ['$scope', '$http',
         function ($scope, $http) {
-            $scope.brewData = [];
-
             var layout = {
                 showlegend: false,
                 xaxis: { title: 'Date / Time', type: 'date' },
@@ -47,12 +45,16 @@
             $http.get('/init').then(function success(resp) {
                 var socket_config = '//' + resp.data.socket_addr + ':' + resp.data.socket_port;
                 
+                $http.get('/api/getlogs/from/' + new Date(new Date().getTime() - (24 * 60 * 60 * 1000)).getTime())
+
                 $http.get('/api/getlogs').then(function success(resp) {
                     $scope.logs = resp.data
                     
                     $scope.brewData = {
                         datasets: [],
                     }
+                    
+                    console.log($scope.logs);
 
                     $scope.logs.forEach(function(controller, idx, ary) {
                         var timestamps = [], sensorValues = [], outputValues = [];
@@ -128,7 +130,7 @@
                 var socket = io(socket_config);
                 socket.on('connect', function () { console.log('connected!'); });
                 socket.on('liveTemp', function(data) { 
-                    if ($scope.brewData.length > 0)
+                    if ($scope.brewData || $scope.brewData.length > 0)
                         $scope.$apply(function () {
                             // for now update the 24 hour graph every time receiving a new 'live' temp
                             // put this in the new 'recordTemp' socket message once that's setup
