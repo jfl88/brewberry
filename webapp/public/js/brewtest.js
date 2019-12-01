@@ -56,16 +56,23 @@
                         var timestamps = [], sensorValues = [], outputValues = [];
 
                         var dataset = {
-                            label: controller.name,
+                            label: controller.name + " " + controller.sensor.name,
                             fill: false,
                             pointRadius: 0,
                             backgroundColor: window.chartColors[idx % window.chartColors.length],
                             borderColor: window.chartColors[idx % window.chartColors.length],
+                            yAxisID: 'temp',
                             data: []
                         }
 
                         var outputset = {
-                            
+                            label: controller.name + " " + controller.output.name,
+                            fill: false,
+                            pointRadius: 0,
+                            backgroundColor: window.chartColors[(idx + ary.length) % window.chartColors.length],
+                            borderColor: window.chartColors[(idx + ary.length) % window.chartColors.length],
+                            yAxisID: 'onoff',
+                            data: []
                         }
 
                         controller.logs.forEach(function (log, idx, ary) {
@@ -78,6 +85,12 @@
                                 y: log.sensorValue
                             })
 
+                            if (controller.output)
+                                outputset.data.push({
+                                    x: new Date(log.timestamp),
+                                    y: log.outputValue
+                                })
+
                             if (idx === ary.length - 1) {
                                 controller.sensor.currentRecord = {};
                                 controller.sensor.currentRecord.timestamp = log.timestamp;
@@ -86,17 +99,8 @@
                         });
                         
                         $scope.brewData.datasets.push(dataset);
-                        console.log(dataset);
-                        // $scope.brewData.push({
-                        //     x: timestamps,
-                        //     y: sensorValues
-                        // });
-    
-                        // if (controller.output)
-                        //     $scope.brewData.push({
-                        //         x: timestamps,
-                        //         y: outputValues,
-                        // });
+                        if (outputset.data.length > 0)
+                            $scope.brewData.datasets.push(outputset);
                         
                         $scope.liveTemp.push(controller);
                     });
@@ -110,9 +114,28 @@
                                     type: 'time'
                                 }],
                                 yAxes: [{
+                                    id: 'temp',
                                     scaleLabel: {
                                         display: true,
                                         labelString: 'Temperature'
+                                    }
+                                },
+                                {
+                                    id: 'onoff',
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'State'
+                                    },
+                                    position: 'right',
+                                    ticks: {
+                                        beginAtZero: true,
+                                        callback: function(value, index, values) {
+                                            if (value % 1 === 0)
+                                                if (value === 0)
+                                                    return 'OFF';
+                                                else
+                                                    return 'ON';
+                                        }
                                     }
                                 }]
                             }
@@ -122,10 +145,7 @@
 
                     var ctx = document.getElementById('brewGraph').getContext('2d');
                     var brewGraph = new Chart(ctx, chartConfig)
-                    // Plotly.newPlot('brewGraph', $scope.brewData, layout, { displaylogo: false, responsive: true });
                 });
-
-                console.log($scope.brewData);
 
                 var socket = io(socket_config);
                 socket.on('connect', function () { console.log('connected!'); });
