@@ -3,5 +3,15 @@ steps:
   args: ['install']
 #- name: 'gcr.io/cloud-builders/npm'  
 #  args: ['test']
+steps:
+- name: gcr.io/cloud-builders/gcloud
+  args:
+  - kms
+  - decrypt
+  - --ciphertext-file=config.json.enc
+  - --plaintext-file=config.json
+  - --location=global
+  - --keyring=bellthorpebrewing
+  - --key=gcb-bb
 - name: "gcr.io/cloud-builders/gcloud"  
   args: ["app", "deploy"]
