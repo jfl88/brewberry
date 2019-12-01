@@ -1,4 +1,4 @@
-const SineSim = require('./sinesim');
+const SineSim = require('./sineSim');
 const ds18b20 = require('./ds18b20');
 
 class Sensor {

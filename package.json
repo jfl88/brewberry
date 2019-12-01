@@ -1,6 +1,6 @@
 {
-  "name": "temp-record",
-  "version": "1.0.0",
+  "name": "brewberry",
+  "version": "0.2.2",
   "description": "Records temperature to a MongoDB and runs a websocket server for live temperature.",
   "main": "app.js",
   "scripts": {
@@ -12,6 +12,7 @@
   "dependencies": {
     "basic-auth": "^2.0.0",
     "body-parser": "^1.18.3",
+    "chart.js": "^2.9.3",
     "cookie-parser": "^1.4.3",
     "debug": "^3.1.0",
     "ds18b20": "^0.1.0",

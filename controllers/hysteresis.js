@@ -12,14 +12,31 @@ class Hysteresis {
         this.updateRate = updateRate;  // minimum update period in milliseconds
 
         this.param = param;
-        //(for hysteresis: onTemp, offTemp, minOffTime)
+        // ideas: alarm high, alarm low
 
         this.interval = {};
         this.runningState = 0;
     }
 
     update() {
+        var newTemp = this.sensor.getValue();
 
+        if (newTemp !== false) {
+            this.sensor.lastRecord.temp         = this.sensor.currentRecord.temp;
+            this.sensor.lastRecord.timestamp    = this.sensor.currentRecord.timestamp;
+            this.sensor.currentRecord.temp      = newTemp;
+            this.sensor.currentRecord.timestamp = new Date();
+        
+            if (this.sensor.lastRecord.temp != this.sensor.currentRecord.temp) {
+                if (!this.output.state && this.sensor.currentRecord.temp > (this.param.setpoint + this.param.onDeadband) && (this.output.lastSwitched + this.param.minOffTime * 1000) < this.sensor.currentRecord.timestamp)
+                    this.output.outputOn();
+                else if (this.output.state && this.sensor.currentRecord.temp < (this.param.setpoint + this.param.offDeadband))
+                    this.output.outputOff();
+                
+                logger.emit('controllerUpdate', this);
+            }
+        } else 
+            this.stopControl();
     }
 
     startControl() {

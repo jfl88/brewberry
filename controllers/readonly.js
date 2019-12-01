@@ -13,6 +13,7 @@ class ReadOnly {
 
         this.param = param;
         //(for nocontrol: nothing)
+        // ideas: alarm high, alarm low
 
         this.interval = {};
         this.runningState = 0;
@@ -24,8 +25,8 @@ class ReadOnly {
         if (newTemp !== false) {
             this.sensor.lastRecord.temp         = this.sensor.currentRecord.temp;
             this.sensor.lastRecord.timestamp    = this.sensor.currentRecord.timestamp;
-            this.sensor.currentRecord.temp      = this.sensor.getValue();
-            this.sensor.currentRecord.timestamp = (new Date()).getTime();
+            this.sensor.currentRecord.temp      = newTemp;
+            this.sensor.currentRecord.timestamp = new Date();
         
             if (this.sensor.lastRecord.temp != this.sensor.currentRecord.temp) {
                 logger.emit('controllerUpdate', this);

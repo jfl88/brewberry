@@ -81,8 +81,18 @@ function onListening() {
   debug('Listening on ' + bind);
 }
 
+const MongoClient = require('mongodb').MongoClient;
+var database;
+
 function init()
 {
+  MongoClient.connect('mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, function(err, db) {
+    if (err)
+        console.log("Error connecting to mongodb: " + JSON.stringify(err));
+    else
+        database = db;
+  });
+
   if (!config.client_only) {
     config.controllers.forEach(function (controller){
       controllers.push(Controller.newController(controller));
@@ -96,7 +106,25 @@ function init()
     });
 
     logger.on('controllerUpdate', function(controller){
-      console.log(controller);
+      //console.log(controller);
+      var record = {
+        "timestamp": controller.sensor.currentRecord.timestamp,
+        "id": controller.id,
+        "name": controller.name,
+        "sensorValue": controller.sensor.currentRecord.temp,
+        "outputValue": controller.output.state,
+        "param": controller.param
+      }
+      
+      if (database) {
+        database.collection('controllerLog').insert(record, (err, result) => {
+          
+          if (err)
+            console.log('Error writing to collection: ' + err.message)
+          //console.log('New Temp Inserted: ' + JSON.stringify(record));
+        });
+      }
+
       io.emit('liveTemp', controller);
     });
   }
@@ -116,6 +144,7 @@ function shutdown() {
     
     console.log('closing sockets');
     io.close();
+    database.close();
   }
   if (ioClient)
     ioClient.close();

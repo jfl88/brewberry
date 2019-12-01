@@ -11,11 +11,13 @@ class SimSwitch {
 
     outputOn() {
         this.state = 1;
+        this.lastSwitched = new Date().getTime();
         return this.state;
     }
 
     outputOff() {
         this.state = 0;
+        this.lastSwitched = new Date().getTime();
         return this.state;
     }
 
