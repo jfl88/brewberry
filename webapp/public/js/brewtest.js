@@ -64,6 +64,10 @@
                             data: []
                         }
 
+                        var outputset = {
+                            
+                        }
+
                         controller.logs.forEach(function (log, idx, ary) {
                             timestamps.push(new Date(log.timestamp));
                             sensorValues.push(log.sensorValue);
