@@ -1,14 +1,12 @@
 const config = require('./config');
 
-const socketServer = require('socket.io');
-
 const webListenPort = 3000;
 
 const webapp = require('./webapp/app');
 const debug = require('debug')('brewtest:server');
 const http = require('http');
 
-var io = socketServer(config.socket_port);
+
 var logger = require('./logger');
 var ioClient;
 
@@ -16,6 +14,7 @@ var port = normalizePort(process.env.PORT || webListenPort);
 webapp.set('port', port);
 
 var server = http.createServer(webapp);
+const io = require('socket.io')(config.socket_port, { cookie: false });
 
 const Controller = require('./controllers/controller');
 
