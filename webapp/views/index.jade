@@ -26,8 +26,11 @@ block content
           .panel-heading
             label Live Temp
           .panel-body
-            h3(ng-repeat="temp in liveTemp")
-              {{ temp.name }}: {{ temp.sensor.currentRecord.temp + temp.sensor.units}} ({{ ((temp.sensor.currentRecord.temp * 9) / 5) + 32 | number:1 }}°F)
+            p(ng-repeat="temp in liveTemp") 
+              label {{ temp.name }} {{ temp.sensor.name }}:&nbsp
+              {{ temp.sensor.currentRecord.temp + temp.sensor.units}} ({{ ((temp.sensor.currentRecord.temp * 9) / 5) + 32 | number:1 }}°F)&nbsp
+              label {{ temp.output ? temp.output.name + ':' : '' }}&nbsp
+              {{ temp.output ? (temp.output.state === 1 ? 'ON' : 'OFF') : ''}}
     .row
       .col-md-12
         .panel.panel-default
