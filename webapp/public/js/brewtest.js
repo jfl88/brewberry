@@ -35,6 +35,8 @@
                 }
             };
 
+            var brewGraph = {};
+
             $scope.liveTemp = [];
 
             $http.get('/api/currentbrew').then(function success(resp) {
@@ -95,6 +97,9 @@
                                 controller.sensor.currentRecord = {};
                                 controller.sensor.currentRecord.timestamp = log.timestamp;
                                 controller.sensor.currentRecord.temp = log.sensorValue;
+
+                                if (controller.output)
+                                    controller.output.state = log.outputValue;
                             }
                         });
                         
@@ -144,7 +149,7 @@
                     }
 
                     var ctx = document.getElementById('brewGraph').getContext('2d');
-                    var brewGraph = new Chart(ctx, chartConfig)
+                    brewGraph = new Chart(ctx, chartConfig)
                 });
 
                 var socket = io(socket_config);
@@ -155,14 +160,15 @@
                             // for now update the 24 hour graph every time receiving a new 'live' temp
                             // put this in the new 'recordTemp' socket message once that's setup
                             var chartIndex = $scope.brewData.datasets.findIndex(function(element){
-                                return element.name === (data.name + " " + data.sensor.name);
+                                return element.label === (data.name + " " + data.sensor.name);
                             });
-                            $scope.liveTemp[chartIndex] = data;
 
-                            // Plotly.extendTraces('brewGraph', { y: [[ data.sensor.currentRecord.temp ]], x: [[ new Date(data.sensor.currentRecord.timestamp) ]] }, [chartIndex]);
+                            $scope.brewData.datasets[chartIndex].data.push({ x: new Date(data.sensor.currentRecord.timestamp), y: data.sensor.currentRecord.temp })
 
-                            // if (data.output)
-                            //     Plotly.extendTraces('brewGraph', { y: [[ data.output.state ]], x: [[ new Date() ]] }, [chartIndex + 1]);
+                            brewGraph.update();
+
+                            if (data.output)
+                                $scope.brewData.datasets[chartIndex + 1].data.push({ x: new Date(), y: data.output.state })
 
                             chartIndex = $scope.liveTemp.findIndex(function (element) {
                                 return element.name === data.name;
