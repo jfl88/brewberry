@@ -6,6 +6,7 @@ Look at config.json.example for explanation of what you need to configure.  Save
 
 # Stuff to develop
 ## Short term
+* add alerts to hysteresis controller
 * add defaults to declaration of modules
 * split out javascript lib to mins, ensure socket.io client is uptodate
 * graph zoom and pan
