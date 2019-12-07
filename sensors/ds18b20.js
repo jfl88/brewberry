@@ -1,4 +1,4 @@
-const sensorLibrary = require('ds18b20')
+const sensorLibrary = require('ds18b20');
 
 class ds18b20 {
 
@@ -13,7 +13,6 @@ class ds18b20 {
         this.currentRecord = {};
 
         // ds18b20 only
-        
     }
 
     getValue() {
