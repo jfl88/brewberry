@@ -12,7 +12,7 @@
     ];
 
     angular
-        .module('brewtest', ['nvd3'])
+        .module('brewtest', [])
         .controller('homeCtrl', ['$scope', '$http',
         function ($scope, $http) {
             var layout = {
@@ -156,27 +156,30 @@
                 var socket = io(socket_config);
                 socket.on('connect', function () { console.log('connected!'); });
                 socket.on('liveTemp', function(data) { 
-                    if ($scope.brewData || $scope.brewData.datasets.length > 0)
-                        $scope.$apply(function () {
-                            // for now update the 24 hour graph every time receiving a new 'live' temp
-                            // put this in the new 'recordTemp' socket message once that's setup
-                            var chartIndex = $scope.brewData.datasets.findIndex(function(element){
-                                return element.label === (data.name + " " + data.sensor.name);
+                    if ($scope.brewData) {
+                        if ($scope.brewData.datasets.length > 0) {
+                            $scope.$apply(function () {
+                                // for now update the 24 hour graph every time receiving a new 'live' temp
+                                // put this in the new 'recordTemp' socket message once that's setup
+                                var chartIndex = $scope.brewData.datasets.findIndex(function(element){
+                                    return element.label === (data.name + " " + data.sensor.name);
+                                });
+
+                                $scope.brewData.datasets[chartIndex].data.push({ x: new Date(data.sensor.currentRecord.timestamp), y: data.sensor.currentRecord.temp })
+
+                                if (data.output)
+                                    $scope.brewData.datasets[chartIndex + 1].data.push({ x: new Date(), y: data.output.state })
+
+                                brewGraph.update();
+
+                                chartIndex = $scope.liveTemp.findIndex(function (element) {
+                                    return element.name === data.name;
+                                });
+
+                                $scope.liveTemp[chartIndex] = data;
                             });
-
-                            $scope.brewData.datasets[chartIndex].data.push({ x: new Date(data.sensor.currentRecord.timestamp), y: data.sensor.currentRecord.temp })
-
-                            brewGraph.update();
-
-                            if (data.output)
-                                $scope.brewData.datasets[chartIndex + 1].data.push({ x: new Date(), y: data.output.state })
-
-                            chartIndex = $scope.liveTemp.findIndex(function (element) {
-                                return element.name === data.name;
-                            });
-
-                            $scope.liveTemp[chartIndex] = data;
-                        });
+                        }
+                    }
                 });
             });
         }
