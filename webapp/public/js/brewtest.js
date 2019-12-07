@@ -74,6 +74,7 @@
                             backgroundColor: window.chartColors[(idx + ary.length) % window.chartColors.length],
                             borderColor: window.chartColors[(idx + ary.length) % window.chartColors.length],
                             yAxisID: 'onoff',
+                            steppedLine: true,
                             data: []
                         }
 
@@ -155,7 +156,7 @@
                 var socket = io(socket_config);
                 socket.on('connect', function () { console.log('connected!'); });
                 socket.on('liveTemp', function(data) { 
-                    if ($scope.brewData || $scope.brewData.length > 0)
+                    if ($scope.brewData || $scope.brewData.datasets.length > 0)
                         $scope.$apply(function () {
                             // for now update the 24 hour graph every time receiving a new 'live' temp
                             // put this in the new 'recordTemp' socket message once that's setup

@@ -6,13 +6,14 @@ Look at config.json.example for explanation of what you need to configure.  Save
 
 # Stuff to develop
 ## Short term
-* Finish Hysteresis controller, including output display
+* add defaults to declaration of modules
 * split out javascript lib to mins, ensure socket.io client is uptodate
+* graph zoom and pan
+* move controller config to DB, interface for CRUD
+* standardised error logger to bubble up errors from classes and log to DB
 
 ## Long term
-* create a TPLink socket switch module
-* logging to database, including temperature & config
-* brew control interface
+* brew control, steps, etc. and CRUD interface
 
 # Object Architecture
 ## Sensor
@@ -52,7 +53,7 @@ Look at config.json.example for explanation of what you need to configure.  Save
 * updateRate
 * param [ 
     { name: value }
-    (for hysteresis: onTemp, offTemp, minOffTime)
+    (for hysteresis: onTemp, offTemp, minOffTime, minOnTime)
 ]
 ### Methods
 * startControl

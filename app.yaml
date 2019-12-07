@@ -12,5 +12,7 @@
 # limitations under the License.
 
 # [START gae_quickstart_yaml]
+service: default
+env: standard
 runtime: nodejs10
 # [END gae_quickstart_yaml]
