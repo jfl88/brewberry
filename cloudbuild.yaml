@@ -13,5 +13,6 @@ steps:
   - --location=global
   - --keyring=bellthorpebrewing
   - --key=gcb-bb
+  - --project=bellthorpe-brewing
 - name: "gcr.io/cloud-builders/gcloud"  
   args: ["app", "deploy"]
