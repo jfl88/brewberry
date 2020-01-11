@@ -1,12 +1,12 @@
 extends layout
 
 block content
-  div(ng-controller='homeCtrl', class='container')
+  div(ng-controller='homeCtrl', class='container-fluid')
     .row
       .col-md-12
         h2=title
         hr
-    .row
+    .row.equal
       .col-sm-6.col-md-6
         .panel.panel-default
           .panel-heading

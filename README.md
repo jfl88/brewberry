@@ -8,7 +8,7 @@ Look at config.json.example for explanation of what you need to configure.  Save
 ## Short term
 * add alerts to hysteresis controller
 * add defaults to declaration of modules
-* split out javascript lib to mins, ensure socket.io client is uptodate
+* convert brew history graphs to chartJS
 * graph zoom and pan
 * move controller config to DB, interface for CRUD
 * standardised error logger to bubble up errors from classes and log to DB
