@@ -31,12 +31,12 @@ var auth = function (req, res, next) {
 /* GET Show brew details for edit */
 router.get('/brew/:brewid', auth, function(req, res, next) {
   console.log(req.params.brewid);
-  MongoClient.connect(url, function(err, db){
-    db.collection('brews')
+  MongoClient.connect(url, function(err, client){
+    client.db().collection('brews')
     .findOne({ "_id": ObjectId(req.params.brewid)}, function(err, doc) {
       assert.equal(err, null);
       res.render('editbrew', { title: 'Jason\'s Magical Brewing Land - Brewing Control Centre', brew: doc });
-      db.close();
+      client.db().close();
     });      
   });
 });
@@ -67,13 +67,13 @@ router.post('/brew/:brewid', auth, function(req, res, next) {
     } 
   } 
 
-  MongoClient.connect(url, function(err, db){
-    db.collection('brews')
+  MongoClient.connect(url, function(err, client){
+    client.db().collection('brews')
     .findOneAndUpdate({ "_id": ObjectId(req.params.brewid)}, brewUpdate, { returnOriginal: false }, function(err, r){
       assert.equal(null, err);
 
       res.render('editbrew', { title: 'Jason\'s Magical Brewing Land - Brewing Control Centre', brew: r.value, update: true });
-      db.close();
+      client.db().close();
     });
   });
 });
@@ -86,17 +86,16 @@ router.post('/brew/', auth, function(req, res, next) {
     recipeUrl: req.body.recipeUrl,
     complete: (req.body.complete === 'on'),
     startDT: req.body.startDT,
-    finishDT: req.body.finishDT,
-    tempData: []
+    finishDT: req.body.finishDT
   } 
 
-  MongoClient.connect(url, function(err, db){
-    db.collection('brews')
+  MongoClient.connect(url, function(err, client){
+    client.db().collection('brews')
     .insertOne(newBrew, function(err, r){
       assert.equal(null, err);
 
       res.render('editbrew', { title: 'Jason\'s Magical Brewing Land - Brewing Control Centre', brew: newBrew._id, update: true });
-      db.close();
+      client.db().close();
     });
   });
 });

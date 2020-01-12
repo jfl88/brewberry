@@ -7,10 +7,12 @@ var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 var url = 'mongodb://' + dblogin.db_user + ':' + dblogin.db_pw + '@' + dblogin.db_addr;
 
+
+
 /* GET history page. */
 router.get('/', function(req, res, next) {
-  MongoClient.connect(url, function(err, db){
-    db.collection('brews')
+  MongoClient.connect(url, function(err, client){
+    client.db().collection('brews')
     .find(req.query)
     .sort({ startDT: -1 })
     .toArray(function(err, docs) {

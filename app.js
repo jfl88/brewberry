@@ -85,11 +85,11 @@ var database;
 
 function init()
 {
-  MongoClient.connect('mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, function(err, db) {
+  MongoClient.connect('mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, function(err, client) {
     if (err)
         console.log("Error connecting to mongodb: " + JSON.stringify(err));
     else
-        database = db;
+        database = client.db();
   });
 
   if (!config.client_only) {

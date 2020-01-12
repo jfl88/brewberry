@@ -48,13 +48,13 @@
                 var socket_config = '//' + resp.data.socket_addr + ':' + resp.data.socket_port;
             
                 $http.get('/api/getlogs').then(function success(resp) {
-                    $scope.logs = resp.data
+                    var logs = resp.data
                     
                     $scope.brewData = {
                         datasets: [],
                     }
 
-                    $scope.logs.forEach(function(controller, idx, ary) {
+                    logs.forEach(function(controller, idx, ary) {
                         var timestamps = [], sensorValues = [], outputValues = [];
 
                         var dataset = {
@@ -189,6 +189,26 @@
         .module('brewtest')
         .controller('historyCtrl', ['$scope', '$http',
         function ($scope, $http) {
+            var layout = {
+                showlegend: false,
+                xaxis: { title: 'Date / Time', type: 'date' },
+                yaxis: { title: 'Temperature (°C)', nticks: 10 },
+                yaxis2: {
+                    title: 'Output Status',
+                    nticks: 2,
+                    range: [ 0, 1 ],
+                    overlaying: 'y',
+                    side: 'right'
+                },
+                margin: {
+                    l: 50,
+                    r: 50,
+                    b: 50,
+                    t: 50,
+                    pad: 4
+                }
+            };
+
             $http.get('/api/brews/').then(function success(resp) {
                 console.log(resp.data);
                 $scope.brews = resp.data;

@@ -3,10 +3,10 @@ const MongoClient = require('mongodb').MongoClient;
 var database;
 
 module.exports = function(logger) {
-  MongoClient.connect(mongoConnectionString, function(err, db) {
+  MongoClient.connect(mongoConnectionString, function(err, client) {
     if (err)
       logger.log("Error connecting to mongodb: " + JSON.stringify(err));
-    database = db;
+    database = client.db();
   });
   return {
     saveRecord: function(record) {
@@ -21,7 +21,7 @@ module.exports = function(logger) {
       });
     },
     close: function() {
-      this.db.close();
+      this.db().close();
     }
   }
 };
