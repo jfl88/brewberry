@@ -14,8 +14,8 @@ router.get('/', function(req, res, next) {
 
 router.route('/api/currentbrew')
   .get(function(req, res, next) {
-    MongoClient.connect(url, function(err, db){
-      db.collection('brews')
+    MongoClient.connect(url, function(err, client){
+      client.db().collection('brews')
       .find({ complete: false })
       .toArray(function(err, docs) {
         assert.equal(err, null);
@@ -28,8 +28,8 @@ router.route('/api/getlogs')
   .get(function(req, res, next) {
     yesterday = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
     var results = [];
-      MongoClient.connect(url, function(err, db){
-        db.collection('controllerLog')
+      MongoClient.connect(url, function(err, client){
+        client.db().collection('controllerLog')
         .find({
           timestamp: {
             $gte: yesterday
@@ -54,11 +54,63 @@ router.route('/api/getlogs')
     });
   });
 
+  router.route('/api/getlogs/:from/:to')
+  .get(function(req, res, next) {
+    from = new Date(+req.params.from);
+    to = new Date(+req.params.to);
+    var results = [];
+      MongoClient.connect(url, function(err, client){
+        client.db().collection('controllerLog')
+        .find({
+          timestamp: {
+            $gte: from,
+            $lte: to
+          }
+        })
+        .sort({ timestamp: 1 })
+        .toArray(function(err, docs) {
+          assert.equal(err, null);
+          config.controllers.forEach(function (controller, idx, ary) {
+            controller.logs = [];
+            docs.forEach(function(log) {
+              if (log.id === controller.id)
+                controller.logs.push(log);
+            });
+          results.push(controller);
+
+          // finished grabbing controller logs, send response
+          if (idx === ary.length - 1)
+            res.json(results);
+        });      
+      });
+    });
+  });
+
 router.route('/api/brews')
   .get(function(req, res, next) {
-    MongoClient.connect(url, function(err, db){
-      db.collection('brews')
-      .find({})
+    MongoClient.connect(url, function(err, client){
+      client.db().collection('brews')
+      .aggregate(
+        {
+          $lookup: {
+            from: "controllerLog",
+            let: { brewStart: "$startDT", brewEnd: "$finishDT" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $gte: [ "$timestamp", "$$brewStart" ] },
+                      { $lte: [ "$timestamp", "$$brewEnd" ]}
+                    ]
+                  }
+                }
+              }
+            ],
+            as: "newTempData"
+          }
+        }
+      )
       .toArray(function(err, docs) {
         assert.equal(err, null);
         res.json(docs);
