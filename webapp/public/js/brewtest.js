@@ -1,15 +1,21 @@
 (function (){
     'use strict';
 
-    window.chartColors = [
+    window.dataColours = [
         'rgb(54, 162, 235)',
         'rgb(255, 99, 132)',
+    ];
+
+    window.outputColours = [
         'rgb(255, 205, 86)',
-        'rgb(75, 192, 192)',
+        'rgb(75, 192, 192)'
+    ]
+
+    window.setpointColours = [
         'rgb(255, 159, 64)',
         'rgb(153, 102, 255)',
         'rgb(201, 203, 207)'
-    ];
+    ]
 
     angular
         .module('brewtest', [])
@@ -61,8 +67,8 @@
                             label: controller.name + " " + controller.sensor.name,
                             fill: false,
                             pointRadius: 0,
-                            backgroundColor: window.chartColors[idx % window.chartColors.length],
-                            borderColor: window.chartColors[idx % window.chartColors.length],
+                            backgroundColor: window.dataColours[idx % window.dataColours.length],
+                            borderColor: window.dataColours[idx % window.dataColours.length],
                             yAxisID: 'temp',
                             data: []
                         }
@@ -71,18 +77,24 @@
                             label: controller.name + " " + controller.output.name,
                             fill: false,
                             pointRadius: 0,
-                            backgroundColor: window.chartColors[(idx + ary.length) % window.chartColors.length],
-                            borderColor: window.chartColors[(idx + ary.length) % window.chartColors.length],
+                            backgroundColor: window.outputColours[idx % window.outputColours.length],
+                            borderColor: window.outputColours[idx % window.outputColours.length],
                             yAxisID: 'onoff',
                             steppedLine: true,
                             data: []
                         }
 
-                        controller.logs.forEach(function (log, idx, ary) {
-                            timestamps.push(new Date(log.timestamp));
-                            sensorValues.push(log.sensorValue);
-                            outputValues.push(log.outputValue);
+                        var setpoint = {
+                            label: controller.name + " Setpoint",
+                            fill: false,
+                            pointRadius: 0,
+                            backgroundColor: window.setpointColours[idx % window.setpointColours.length],
+                            borderColor: window.setpointColours[idx % window.setpointColours.length],
+                            yAxisID: 'temp',
+                            data: []
+                        }
 
+                        controller.logs.forEach(function (log, idx, ary) {
                             dataset.data.push({
                                 x: new Date(log.timestamp),
                                 y: log.sensorValue
@@ -93,6 +105,12 @@
                                     x: new Date(log.timestamp),
                                     y: log.outputValue
                                 })
+
+                            if (controller.param.setpoint !== undefined)
+                                setpoint.data.push({
+                                    x: new Date(log.timestamp),
+                                    y: log.param.setpoint
+                            })
 
                             if (idx === ary.length - 1) {
                                 controller.sensor.currentRecord = {};
@@ -108,6 +126,9 @@
                         if (outputset.data.length > 0)
                             $scope.brewData.datasets.push(outputset);
                         
+                        if (setpoint.data.length > 0)
+                            $scope.brewData.datasets.push(setpoint);
+                        
                         $scope.liveTemp.push(controller);
                     });
 
@@ -115,11 +136,16 @@
                         type: 'line',
                         data: $scope.brewData,
                         options: {
+                            tooltips: {
+                                // display all datapoints on tooltip
+                                mode: 'label'
+                            },
                             scales: {
                                 xAxes: [{
                                     type: 'time'
                                 }],
-                                yAxes: [{
+                                yAxes: [
+                                {
                                     id: 'temp',
                                     scaleLabel: {
                                         display: true,
