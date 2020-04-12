@@ -61,7 +61,6 @@
                     }
 
                     logs.forEach(function(controller, idx, ary) {
-                        var timestamps = [], sensorValues = [], outputValues = [];
 
                         var dataset = {
                             label: controller.name + " " + controller.sensor.name,
