@@ -136,6 +136,10 @@
                         type: 'line',
                         data: $scope.brewData,
                         options: {
+                            tooltips: {
+                                // display all datapoints on tooltip
+                                mode: 'label'
+                            },
                             scales: {
                                 xAxes: [{
                                     type: 'time'
