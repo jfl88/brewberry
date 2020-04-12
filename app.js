@@ -132,6 +132,7 @@ function init()
       console.log('someone connected!');
       socket.on('getControllers', function() {
         console.log('received req for controllers');
+        io.emit('sendControllers', config.controllers);
       });
     });
   } else {
