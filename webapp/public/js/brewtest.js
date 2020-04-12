@@ -144,7 +144,8 @@
                                 xAxes: [{
                                     type: 'time'
                                 }],
-                                yAxes: [{
+                                yAxes: [
+                                {
                                     id: 'temp',
                                     scaleLabel: {
                                         display: true,
