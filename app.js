@@ -8,13 +8,15 @@ const http = require('http');
 
 
 var logger = require('./logger');
-var ioClient;
 
 var port = normalizePort(process.env.PORT || webListenPort);
 webapp.set('port', port);
+webapp.set('config', config);
 
 var server = http.createServer(webapp);
 const io = require('socket.io')(config.socket_port, { cookie: false });
+const ioClient = require('socket.io-client');
+var clientSocket;
 
 const Controller = require('./controllers/controller');
 
@@ -123,8 +125,25 @@ function init()
           //console.log('New Temp Inserted: ' + JSON.stringify(record));
         });
       }
-
       io.emit('liveTemp', controller);
+    });
+
+    io.on('connection', function(socket){
+      console.log('someone connected!');
+      socket.on('getControllers', function() {
+        console.log('received req for controllers');
+      });
+    });
+  } else {
+    clientSocket = ioClient('http://' + config.socket_addr + ':' + config.socket_port);
+    clientSocket.on('connect', function () { 
+      console.log('connected!');
+      clientSocket.emit('getControllers');
+    });
+    clientSocket.on('sendControllers', function(data) {
+      config.controllers = data;
+      console.log('received ' + config.controllers.length + ' controllers');
+      webapp.set('config', config);
     });
   }
   server.listen(port);
@@ -145,8 +164,8 @@ function shutdown() {
     io.close();
     database.close();
   }
-  if (ioClient)
-    ioClient.close();
+  if (clientSocket !== undefined)
+    clientSocket.close();
   process.exit(2);
 }
 

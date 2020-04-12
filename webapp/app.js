@@ -4,7 +4,6 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var config = require('../config');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -31,6 +30,7 @@ app.use('/history', history);
 app.use('/control', control);
 
 app.use('/init',function (req, res) {
+  var config = app.get('config');
   res.json({
     "socket_addr": config.socket_addr,
     "socket_port": config.socket_port
