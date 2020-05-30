@@ -34,7 +34,13 @@ class TPLink {
                     console.log('Failed to power switch on');
                 
                 return this.state;
+            }).catch((error) => {
+                console.error("Failed to turn on TPLink Switch");
+                console.error(error);
             })
+        }).catch((error) => {
+            console.error("Failed to Connect to TPLink Switch");
+            console.error(error);
         });
     }
 
@@ -49,7 +55,13 @@ class TPLink {
                     console.log('Failed to power switch off');
                 
                 return this.state;
+            }).catch((error) => {
+                console.error("Failed to turn off TPLink Switch");
+                console.error(error);
             })
+        }).catch((error) => {
+            console.error("Failed to Connect to TPLink Switch");
+            console.error(error);
         });
     }
 
