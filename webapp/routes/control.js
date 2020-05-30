@@ -36,7 +36,7 @@ router.get('/brew/:brewid', auth, function(req, res, next) {
     .findOne({ "_id": ObjectId(req.params.brewid)}, function(err, doc) {
       assert.equal(err, null);
       res.render('editbrew', { title: 'Jason\'s Magical Brewing Land - Brewing Control Centre', brew: doc });
-      client.db().close();
+      client.close();
     });      
   });
 });
