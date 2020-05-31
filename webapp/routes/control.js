@@ -55,15 +55,15 @@ router.get('/brew', auth, function(req, res, next) {
   res.render('editbrew', { title: 'Jason\'s Magical Brewing Land - Brewing Control Centre', brew: newBrew });
 });
 
-/* POST Handle update data */
+/* POST Handle update data for an EXISTING brew*/
 router.post('/brew/:brewid', auth, function(req, res, next) {
   console.log(req.body);
   brewUpdate = { $set: {
       name: req.body.name,
       recipeUrl: req.body.recipeUrl,
       complete: (req.body.complete === 'on'),
-      startDT: req.body.startDT,
-      finishDT: req.body.finishDT
+      startDT: new Date(req.body.startDT),
+      finishDT: new Date(req.body.finishDT)
     } 
   } 
 
@@ -73,20 +73,20 @@ router.post('/brew/:brewid', auth, function(req, res, next) {
       assert.equal(null, err);
 
       res.render('editbrew', { title: 'Jason\'s Magical Brewing Land - Brewing Control Centre', brew: r.value, update: true });
-      client.db().close();
+      client.close();
     });
   });
 });
 
-/* POST Handle update data */
+/* POST Handle update data for a NEW brew */
 router.post('/brew/', auth, function(req, res, next) {
   console.log(req.body);
   var newBrew = { 
     name: req.body.name,
     recipeUrl: req.body.recipeUrl,
     complete: (req.body.complete === 'on'),
-    startDT: req.body.startDT,
-    finishDT: req.body.finishDT
+    startDT: new Date(req.body.startDT),
+    finishDT: null
   } 
 
   MongoClient.connect(url, function(err, client){
@@ -95,20 +95,9 @@ router.post('/brew/', auth, function(req, res, next) {
       assert.equal(null, err);
 
       res.render('editbrew', { title: 'Jason\'s Magical Brewing Land - Brewing Control Centre', brew: newBrew._id, update: true });
-      client.db().close();
+      client.close();
     });
   });
 });
-
-// example 'inserting' a subdocument
-// use this for the annotations
-//
-// db.posts.update({ _id: ObjectId( "510a3c5382d395b70b000034" ) },
-// {
-//  $push: { comments: { "_id" : ObjectId( "..." ),
-//  "authorId" : ObjectId( "..." ),
-//  "content" : "",
-//  "createdAt" : Date(...) } }
-// })
 
 module.exports = router;

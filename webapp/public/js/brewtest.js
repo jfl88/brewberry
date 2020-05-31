@@ -21,25 +21,6 @@
         .module('brewtest', [])
         .controller('homeCtrl', ['$scope', '$http',
         function ($scope, $http) {
-            var layout = {
-                showlegend: false,
-                xaxis: { title: 'Date / Time', type: 'date' },
-                yaxis: { title: 'Temperature (°C)', nticks: 10 },
-                yaxis2: {
-                    title: 'Output Status',
-                    nticks: 2,
-                    range: [ 0, 1 ],
-                    overlaying: 'y',
-                    side: 'right'
-                },
-                margin: {
-                    l: 50,
-                    r: 50,
-                    b: 50,
-                    t: 50,
-                    pad: 4
-                }
-            };
 
             var brewGraph = {};
 
