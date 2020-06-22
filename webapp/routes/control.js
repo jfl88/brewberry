@@ -3,11 +3,11 @@ var router = express.Router();
 var basicAuth = require('basic-auth');
 
 // db stuff
-var dblogin = require('../../config.json');
+var config = require('../../config.json');
 var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectId;
 var assert = require('assert');
-var url = 'mongodb://' + dblogin.db_user + ':' + dblogin.db_pw + '@' + dblogin.db_addr;
+var url = 'mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr;
 
 var auth = function (req, res, next) {
   function unauthorized(res) {
@@ -21,12 +21,17 @@ var auth = function (req, res, next) {
     return unauthorized(res);
   };
 
-  if (user.name === dblogin.control_login && user.pass === dblogin.control_password) {
+  if (user.name === config.control_login && user.pass === config.control_password) {
     return next();
   } else {
     return unauthorized(res);
   };
 };
+
+router.get('/', auth, function(req, res, next){
+  console.log('lolwut');
+  res.render('control', { title: 'Jason\'s Magical Brewing Land - Brewing Control Centre', controllers: config.controllers });
+});
 
 /* GET Show brew details for edit */
 router.get('/brew/:brewid', auth, function(req, res, next) {
