@@ -19,8 +19,8 @@ block content
               label Name:&nbsp
               a(href='{{ currentBrew.recipeUrl }}') {{ currentBrew.name }}
             p
-              label Started:
-              &nbsp {{ currentBrew.startDT | date }}
+              label Started:&nbsp
+              | {{ currentBrew.startDT | date }}
       .col-sm-6.col-md-6
         .panel.panel-default
           .panel-heading
@@ -28,9 +28,9 @@ block content
           .panel-body
             p(ng-repeat="temp in liveTemp") 
               label {{ temp.name }} {{ temp.sensor.name }}:&nbsp
-              {{ temp.sensor.currentRecord.temp + temp.sensor.units}} ({{ ((temp.sensor.currentRecord.temp * 9) / 5) + 32 | number:1 }}°F)&nbsp
+              | {{ temp.sensor.currentRecord.temp + temp.sensor.units}} ({{ ((temp.sensor.currentRecord.temp * 9) / 5) + 32 | number:1 }}°F)&nbsp
               label {{ temp.output ? temp.output.name + ':' : '' }}&nbsp
-              {{ temp.output ? (temp.output.state === 1 ? 'ON' : 'OFF') : ''}}&nbsp
+              | {{ temp.output ? (temp.output.state === 1 ? 'ON' : 'OFF') : ''}}&nbsp
     .row
       .col-md-12
         .panel.panel-default
