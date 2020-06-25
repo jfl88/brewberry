@@ -3,7 +3,10 @@ const MongoClient = require('mongodb').MongoClient;
 var database;
 
 module.exports = function(logger) {
-  MongoClient.connect(mongoConnectionString, function(err, client) {
+  MongoClient.connect(mongoConnectionString, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  }, function(err, client) {
     if (err)
       logger.log("Error connecting to mongodb: " + JSON.stringify(err));
     database = client.db();

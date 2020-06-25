@@ -36,7 +36,10 @@ router.get('/', auth, function(req, res, next){
 /* GET Show brew details for edit */
 router.get('/brew/:brewid', auth, function(req, res, next) {
   console.log(req.params.brewid);
-  MongoClient.connect(url, function(err, client){
+  MongoClient.connect(url, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  }, function(err, client){
     client.db().collection('brews')
     .findOne({ "_id": ObjectId(req.params.brewid)}, function(err, doc) {
       assert.equal(err, null);
@@ -72,7 +75,10 @@ router.post('/brew/:brewid', auth, function(req, res, next) {
     } 
   } 
 
-  MongoClient.connect(url, function(err, client){
+  MongoClient.connect(url, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  }, function(err, client){
     client.db().collection('brews')
     .findOneAndUpdate({ "_id": ObjectId(req.params.brewid)}, brewUpdate, { returnOriginal: false }, function(err, r){
       assert.equal(null, err);
@@ -94,7 +100,10 @@ router.post('/brew/', auth, function(req, res, next) {
     finishDT: null
   } 
 
-  MongoClient.connect(url, function(err, client){
+  MongoClient.connect(url, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  }, function(err, client){
     client.db().collection('brews')
     .insertOne(newBrew, function(err, r){
       assert.equal(null, err);

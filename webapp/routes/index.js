@@ -14,12 +14,16 @@ router.get('/', function(req, res, next) {
 
 router.route('/api/currentbrew')
   .get(function(req, res, next) {
-    MongoClient.connect(url, function(err, client){
+    MongoClient.connect(url, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    }, function(err, client){
       client.db().collection('brews')
       .find({ complete: false })
       .toArray(function(err, docs) {
         assert.equal(err, null);
         res.json(docs);
+        client.close();
       });      
     });
   });
@@ -28,7 +32,10 @@ router.route('/api/getlogs')
   .get(function(req, res, next) {
     yesterday = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
     var results = [];
-      MongoClient.connect(url, function(err, client){
+      MongoClient.connect(url, {
+        useUnifiedTopology: true,
+        useNewUrlParser: true,
+      }, function(err, client){
         client.db().collection('controllerLog')
         .find({
           timestamp: {
@@ -49,6 +56,7 @@ router.route('/api/getlogs')
           // finished grabbing controller logs, send response
           if (idx === ary.length - 1)
             res.json(results);
+            client.close();
         });      
       });
     });
@@ -59,7 +67,10 @@ router.route('/api/getlogs')
     from = new Date(+req.params.from);
     to = new Date(+req.params.to);
     var results = [];
-      MongoClient.connect(url, function(err, client){
+      MongoClient.connect(url, {
+        useUnifiedTopology: true,
+        useNewUrlParser: true,
+      }, function(err, client){
         client.db().collection('controllerLog')
         .find({
           timestamp: {
@@ -81,6 +92,8 @@ router.route('/api/getlogs')
           // finished grabbing controller logs, send response
           if (idx === ary.length - 1)
             res.json(results);
+          
+          client.close();
         });      
       });
     });
@@ -88,7 +101,10 @@ router.route('/api/getlogs')
 
 router.route('/api/brews')
   .get(function(req, res, next) {
-    MongoClient.connect(url, function(err, client){
+    MongoClient.connect(url, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    }, function(err, client){
       client.db().collection('brews')
       .aggregate(
         {
@@ -114,6 +130,7 @@ router.route('/api/brews')
       .toArray(function(err, docs) {
         assert.equal(err, null);
         res.json(docs);
+        client.close();
       });      
     });
   });

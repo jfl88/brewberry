@@ -87,11 +87,14 @@ var database;
 
 function init()
 {
-  MongoClient.connect('mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, function(err, client) {
-    if (err)
-        console.log("Error connecting to mongodb: " + JSON.stringify(err));
-    else
-        database = client.db();
+  MongoClient.connect('mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    }, function(err, client) {
+      if (err)
+          console.log("Error connecting to mongodb: " + JSON.stringify(err));
+      else
+          database = client.db();
   });
 
   if (!config.client_only) {
