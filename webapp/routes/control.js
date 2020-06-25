@@ -31,7 +31,7 @@ var auth = function (req, res, next) {
 // Display Control Panel page
 router.get('/', auth, function(req, res, next){
   
-  res.render('control', { title: 'Jason\'s Magical Brewing Land - Brewing Control Centre', controllers: config.controllers });
+  res.render('control', { title: 'Bellthorpe Brewing - Brewing Control Centre', controllers: config.controllers });
 });
 
 /* GET Show brew details for edit EXISTING brew */
@@ -44,7 +44,7 @@ router.get('/brew/:brewid', auth, function(req, res, next) {
     client.db().collection('brews')
     .findOne({ "_id": ObjectId(req.params.brewid)}, function(err, doc) {
       assert.equal(err, null);
-      res.render('editbrew', { title: 'Jason\'s Magical Brewing Land - Edit Brew', brew: doc });
+      res.render('editbrew', { title: 'Bellthorpe Brewing - Edit Brew', brew: doc });
       client.close();
     });      
   });
@@ -61,7 +61,7 @@ router.get('/brew', auth, function(req, res, next) {
     startDT : '',
     finishDT : ''
   }
-  res.render('editbrew', { title: 'Jason\'s Magical Brewing Land - Create Brew', brew: newBrew });
+  res.render('editbrew', { title: 'Bellthorpe Brewing - Create Brew', brew: newBrew });
 });
 
 /* POST Handle update data for an EXISTING brew*/
@@ -84,7 +84,7 @@ router.post('/brew/:brewid', auth, function(req, res, next) {
     .findOneAndUpdate({ "_id": ObjectId(req.params.brewid)}, brewUpdate, { returnOriginal: false }, function(err, r){
       assert.equal(null, err);
 
-      res.render('editbrew', { title: 'Jason\'s Magical Brewing Land - Brewing Control Centre', brew: r.value, update: true });
+      res.render('editbrew', { title: 'Bellthorpe Brewing - Brewing Control Centre', brew: r.value, update: true });
       client.close();
     });
   });
@@ -109,7 +109,7 @@ router.post('/brew/', auth, function(req, res, next) {
     .insertOne(newBrew, function(err, r){
       assert.equal(null, err);
 
-      res.render('editbrew', { title: 'Jason\'s Magical Brewing Land - Brewing Control Centre', brew: newBrew._id, update: true });
+      res.render('editbrew', { title: 'Bellthorpe Brewing - Brewing Control Centre', brew: newBrew._id, update: true });
       client.close();
     });
   });

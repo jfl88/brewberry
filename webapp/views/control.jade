@@ -15,14 +15,27 @@ block content
               label=controller.name
             .panel-body
               p
+                label Model:&nbsp
+                | #{controller.model}
+              p
+                label Update Rate:&nbsp
+                | #{controller.updateRate}
+              hr
+              p
                 label Sensor:&nbsp
                 | #{controller.sensor.name}
               p
                 label Output:&nbsp
                 | #{controller.output.name}
               if controller.param
+              hr
+              label Controller Parameters:
+              table.table
+                tr
+                  th Name
+                  th Value
                 each item, name in controller.param
-                  p
-                    label #{name}:&nbsp
-                    | #{item}
+                  tr
+                    td #{name}
+                    td #{item}
 
