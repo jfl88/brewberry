@@ -87,11 +87,14 @@ var database;
 
 function init()
 {
-  MongoClient.connect('mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, function(err, client) {
-    if (err)
-        console.log("Error connecting to mongodb: " + JSON.stringify(err));
-    else
-        database = client.db();
+  MongoClient.connect('mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    }, function(err, client) {
+      if (err)
+          console.log("Error connecting to mongodb: " + JSON.stringify(err));
+      else
+          database = client.db();
   });
 
   if (!config.client_only) {
@@ -118,11 +121,16 @@ function init()
       }
       
       if (database) {
-        database.collection('controllerLog').insert(record, (err, result) => {
+        database.collection('controllerLog').insertOne(record, (err, result) => {
           
           if (err)
-            console.log('Error writing to collection: ' + err.message)
+            console.error('Error writing to collection: ' + err.message)
           //console.log('New Temp Inserted: ' + JSON.stringify(record));
+        });
+        database.collection('brews')
+          .findOneAndUpdate({ "complete": false}, { $push: { logs: record }}, function(err, r){
+            if (err)
+              console.error('Error writing to collection: ' + err.message)
         });
       }
       io.emit('liveTemp', controller);
@@ -163,7 +171,6 @@ function shutdown() {
     
     console.log('closing sockets');
     io.close();
-    database.close();
   }
   if (clientSocket !== undefined)
     clientSocket.close();

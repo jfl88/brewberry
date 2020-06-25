@@ -13,6 +13,7 @@ class SineSim {
         // sineSim only
         this.lastCycle = (new Date()).getTime();
         this.interval = 50000 * Math.random();
+        this.centrepoint = 20;
     }
 
     getValue() {
@@ -23,7 +24,7 @@ class SineSim {
             this.lastCycle = currentCheck
     
         if (randomnum > 0.5)
-            return (randomnum + 20 + Math.sin(Math.PI * 2 * millisecondsSinceLastCheck/this.interval) * 2).toFixed(2);
+            return (randomnum + this.centrepoint + Math.sin(Math.PI * 2 * millisecondsSinceLastCheck/this.interval) * 2).toFixed(2);
         else
             return this.lastRecord.temp;
     }

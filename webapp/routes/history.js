@@ -11,7 +11,10 @@ var url = 'mongodb://' + dblogin.db_user + ':' + dblogin.db_pw + '@' + dblogin.d
 
 /* GET history page. */
 router.get('/', function(req, res, next) {
-  MongoClient.connect(url, function(err, client){
+  MongoClient.connect(url, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  }, function(err, client){
     client.db().collection('brews')
     .find(req.query)
     .sort({ startDT: -1 })
@@ -20,6 +23,7 @@ router.get('/', function(req, res, next) {
       console.log("Found the following records");
       console.dir(docs)
       res.render('history', { title: 'Bellthorpe Brewing - Brew History', brews: docs });
+      client.close();
     });      
   });
 });
