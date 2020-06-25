@@ -28,12 +28,13 @@ var auth = function (req, res, next) {
   };
 };
 
+// Display Control Panel page
 router.get('/', auth, function(req, res, next){
-  console.log('lolwut');
+  
   res.render('control', { title: 'Jason\'s Magical Brewing Land - Brewing Control Centre', controllers: config.controllers });
 });
 
-/* GET Show brew details for edit */
+/* GET Show brew details for edit EXISTING brew */
 router.get('/brew/:brewid', auth, function(req, res, next) {
   console.log(req.params.brewid);
   MongoClient.connect(url, {
@@ -43,13 +44,13 @@ router.get('/brew/:brewid', auth, function(req, res, next) {
     client.db().collection('brews')
     .findOne({ "_id": ObjectId(req.params.brewid)}, function(err, doc) {
       assert.equal(err, null);
-      res.render('editbrew', { title: 'Jason\'s Magical Brewing Land - Brewing Control Centre', brew: doc });
+      res.render('editbrew', { title: 'Jason\'s Magical Brewing Land - Edit Brew', brew: doc });
       client.close();
     });      
   });
 });
 
-/* GET Show brew details for edit */
+/* GET Show brew details for edit NEW brew */
 router.get('/brew', auth, function(req, res, next) {
   console.log(req.params.brewid);
   var newBrew = {
@@ -60,7 +61,7 @@ router.get('/brew', auth, function(req, res, next) {
     startDT : '',
     finishDT : ''
   }
-  res.render('editbrew', { title: 'Jason\'s Magical Brewing Land - Brewing Control Centre', brew: newBrew });
+  res.render('editbrew', { title: 'Jason\'s Magical Brewing Land - Create Brew', brew: newBrew });
 });
 
 /* POST Handle update data for an EXISTING brew*/

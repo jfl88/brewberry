@@ -15,14 +15,14 @@ block content
               label=controller.name
             .panel-body
               p
-                label Sensor:
-                &nbsp#{controller.sensor.name}
+                label Sensor:&nbsp
+                | #{controller.sensor.name}
               p
-                label Output:
-                &nbsp#{controller.output.name}
+                label Output:&nbsp
+                | #{controller.output.name}
               if controller.param
                 each item, name in controller.param
                   p
-                    label #{name}:
-                    &nbsp#{item}
+                    label #{name}:&nbsp
+                    | #{item}
 
