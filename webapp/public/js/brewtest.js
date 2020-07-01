@@ -218,32 +218,53 @@
                 console.log(resp.data);
                 $scope.brews = resp.data;
                 $scope.brews.forEach(function (brew) {
-                    brew.graph = [{
-                        x: [],
-                        y: [],
-                        type: 'scatter'
-                    }];
+                    var datasets = [];
 
-                    brew.layout = {
-                        showlegend: false,
-                        xaxis: { title: 'Date / Time', type: 'date' },
-                        yaxis: { title: 'Temperature (°C)', nticks: 10 },
-                        margin: {
-                            l: 50,
-                            r: 50,
-                            b: 50,
-                            t: 50,
-                            pad: 4
-                        }
-                    };
 
-                    brew.tempData.forEach(function(record) {
-                        brew.graph[0].x.push(new Date(record.timestamp));
-                        brew.graph[0].y.push(record.temp);
-                    });
 
-                    Plotly.newPlot(brew._id, brew.graph, brew.layout, { displaylogo: false });
+                    
                 });
+                var chartConfig = {
+                    type: 'line',
+                    data: [],
+                    options: {
+                        tooltips: {
+                            // display all datapoints on tooltip
+                            mode: 'label'
+                        },
+                        scales: {
+                            xAxes: [{
+                                type: 'time'
+                            }],
+                            yAxes: [
+                            {
+                                id: 'temp',
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Temperature'
+                                }
+                            },
+                            {
+                                id: 'onoff',
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'State'
+                                },
+                                position: 'right',
+                                ticks: {
+                                    beginAtZero: true,
+                                    callback: function(value, index, values) {
+                                        if (value % 1 === 0)
+                                            if (value === 0)
+                                                return 'OFF';
+                                            else
+                                                return 'ON';
+                                    }
+                                }
+                            }]
+                        }
+                    }
+                }
             });
 
         }
