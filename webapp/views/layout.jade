@@ -32,8 +32,12 @@ html
             li
               a(href='#contact') Contact
           ul.nav.navbar-nav.navbar-right
-            li
-              a(href='/control') Control
+            li.dropdown
+              a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-expanded='false') Control
+                  span.caret
+              ul.dropdown-menu(role='menu')
+                li
+                  a(href='/control') Control
     .container
       block content
     .container
