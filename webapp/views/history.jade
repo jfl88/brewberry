@@ -24,3 +24,10 @@ block content
                 label Stage:&nbsp
                 | Fermentation (started #{brew.startDT})
               div(id=brew._id)
+    .row
+      .col-sm-6
+        if page > 1
+          a(href='/history/' + (parseInt(page) - 1)) Prev Page
+      .col-sm-6.text-right
+        if page < numPages
+          a(href='/history/' + (parseInt(page) + 1)) Next Page
