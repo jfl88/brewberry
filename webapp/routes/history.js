@@ -28,7 +28,7 @@ router.get('/:page?', function(req, res, next) {
         assert.equal(err, null);
         console.log("Found the following records");
         console.dir(docs)
-        res.render('history', { title: 'Bellthorpe Brewing - Brew History', brews: docs, page: page, numPages: count / resPerPage });
+        res.render('history', { title: 'Bellthorpe Brewing - Brew History', brews: docs, page: page, numPages: Math.ceil(count / resPerPage) });
         client.close();
       });
     })
