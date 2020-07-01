@@ -33,8 +33,7 @@
             // get socket config from the server, connect to socket server and create listeners
             $http.get('/init').then(function success(resp) {
                 var socket_config = '//' + resp.data.socket_addr + ':' + resp.data.socket_port;
-            
-                $http.get('/api/getlogs').then(function success(resp) {
+                $http.get('/api/getlogs/' + new Date(new Date().getTime() - (24 * 60 * 60 * 1000)).getTime().toString() + '/' + new Date().getTime().toString()).then(function success(resp) {
                     var logs = resp.data
                     
                     $scope.brewData = {

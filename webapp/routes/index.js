@@ -28,40 +28,6 @@ router.route('/api/currentbrew')
     });
   });
 
-router.route('/api/getlogs')
-  .get(function(req, res, next) {
-    yesterday = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
-    var results = [];
-      MongoClient.connect(url, {
-        useUnifiedTopology: true,
-        useNewUrlParser: true,
-      }, function(err, client){
-        client.db().collection('controllerLog')
-        .find({
-          timestamp: {
-            $gte: yesterday
-          }
-        })
-        .sort({ timestamp: 1 })
-        .toArray(function(err, docs) {
-          assert.equal(err, null);
-          config.controllers.forEach(function (controller, idx, ary) {
-            controller.logs = [];
-            docs.forEach(function(log) {
-              if (log.id === controller.id)
-                controller.logs.push(log);
-            });
-          results.push(controller);
-
-          // finished grabbing controller logs, send response
-          if (idx === ary.length - 1)
-            res.json(results);
-            client.close();
-        });      
-      });
-    });
-  });
-
   router.route('/api/getlogs/:from/:to')
   .get(function(req, res, next) {
     from = new Date(+req.params.from);
