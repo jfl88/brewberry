@@ -33,8 +33,7 @@
             // get socket config from the server, connect to socket server and create listeners
             $http.get('/init').then(function success(resp) {
                 var socket_config = '//' + resp.data.socket_addr + ':' + resp.data.socket_port;
-            
-                $http.get('/api/getlogs').then(function success(resp) {
+                $http.get('/api/getlogs/' + new Date(new Date().getTime() - (24 * 60 * 60 * 1000)).getTime().toString() + '/' + new Date().getTime().toString()).then(function success(resp) {
                     var logs = resp.data
                     
                     $scope.brewData = {
@@ -219,32 +218,53 @@
                 console.log(resp.data);
                 $scope.brews = resp.data;
                 $scope.brews.forEach(function (brew) {
-                    brew.graph = [{
-                        x: [],
-                        y: [],
-                        type: 'scatter'
-                    }];
+                    var datasets = [];
 
-                    brew.layout = {
-                        showlegend: false,
-                        xaxis: { title: 'Date / Time', type: 'date' },
-                        yaxis: { title: 'Temperature (°C)', nticks: 10 },
-                        margin: {
-                            l: 50,
-                            r: 50,
-                            b: 50,
-                            t: 50,
-                            pad: 4
-                        }
-                    };
 
-                    brew.tempData.forEach(function(record) {
-                        brew.graph[0].x.push(new Date(record.timestamp));
-                        brew.graph[0].y.push(record.temp);
-                    });
 
-                    Plotly.newPlot(brew._id, brew.graph, brew.layout, { displaylogo: false });
+                    
                 });
+                var chartConfig = {
+                    type: 'line',
+                    data: [],
+                    options: {
+                        tooltips: {
+                            // display all datapoints on tooltip
+                            mode: 'label'
+                        },
+                        scales: {
+                            xAxes: [{
+                                type: 'time'
+                            }],
+                            yAxes: [
+                            {
+                                id: 'temp',
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Temperature'
+                                }
+                            },
+                            {
+                                id: 'onoff',
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'State'
+                                },
+                                position: 'right',
+                                ticks: {
+                                    beginAtZero: true,
+                                    callback: function(value, index, values) {
+                                        if (value % 1 === 0)
+                                            if (value === 0)
+                                                return 'OFF';
+                                            else
+                                                return 'ON';
+                                    }
+                                }
+                            }]
+                        }
+                    }
+                }
             });
 
         }

@@ -25,7 +25,7 @@ var auth = function (req, res, next) {
     return next();
   } else {
     return unauthorized(res);
-  };
+  }; 
 };
 
 // Display Control Panel page

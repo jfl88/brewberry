@@ -10,21 +10,28 @@ var url = 'mongodb://' + dblogin.db_user + ':' + dblogin.db_pw + '@' + dblogin.d
 
 
 /* GET history page. */
-router.get('/', function(req, res, next) {
+router.get('/:page?', function(req, res, next) {
+  const resPerPage = 5; // results per page
+  const page = req.params.page || 1; // Page 
+
   MongoClient.connect(url, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
   }, function(err, client){
     client.db().collection('brews')
-    .find(req.query)
-    .sort({ startDT: -1 })
-    .toArray(function(err, docs) {
-      assert.equal(err, null);
-      console.log("Found the following records");
-      console.dir(docs)
-      res.render('history', { title: 'Bellthorpe Brewing - Brew History', brews: docs });
-      client.close();
-    });      
+    .countDocuments({}, function(err, count){
+      client.db().collection('brews').find(req.query)
+      .sort({ startDT: -1 })
+      .skip(page > 1 ? ((page - 1) * resPerPage) : 0)
+      .limit(resPerPage)
+      .toArray(function(err, docs) {
+        assert.equal(err, null);
+        console.log("Found the following records");
+        console.dir(docs)
+        res.render('history', { title: 'Bellthorpe Brewing - Brew History', brews: docs, page: page, numPages: Math.ceil(count / resPerPage) });
+        client.close();
+      });
+    })
   });
 });
 
