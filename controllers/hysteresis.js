@@ -1,4 +1,4 @@
-const logger = require('../logger');
+const emitter = require('../emitter');
 
 class Hysteresis {
     constructor(id, name, sensor, output, updateRate, param) {
@@ -33,7 +33,7 @@ class Hysteresis {
                 else if (this.output.state && this.sensor.currentRecord.temp < (this.param.setpoint + this.param.offDeadband) && (this.output.lastSwitched + this.param.minOnTime * 1000) < this.sensor.currentRecord.timestamp)
                     this.output.outputOff();
                 
-                logger.emit('controllerUpdate', this);
+                emitter.emit('controllerUpdate', this);
             }
         } else 
             this.stopControl();

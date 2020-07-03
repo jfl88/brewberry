@@ -7,7 +7,7 @@ const debug = require('debug')('brewtest:server');
 const http = require('http');
 
 
-var logger = require('./logger');
+var emitter = require('./emitter');
 
 var port = normalizePort(process.env.PORT || webListenPort);
 webapp.set('port', port);
@@ -109,7 +109,7 @@ function init()
         console.log('failed to start controller: ' + controller.name);
     });
 
-    logger.on('controllerUpdate', function(controller){
+    emitter.on('controllerUpdate', function(controller){
       //console.log(controller);
       var record = {
         "timestamp": controller.sensor.currentRecord.timestamp,

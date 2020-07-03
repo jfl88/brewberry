@@ -1,4 +1,4 @@
-const logger = require('../logger');
+const emitter = require('../emitter');
 
 class ReadOnly {
     constructor(id, name, sensor, output, updateRate, param) {
@@ -29,7 +29,7 @@ class ReadOnly {
             this.sensor.currentRecord.timestamp = new Date();
         
             if (this.sensor.lastRecord.temp != this.sensor.currentRecord.temp) {
-                logger.emit('controllerUpdate', this);
+                emitter.emit('controllerUpdate', this);
             }
         } else 
             this.stopControl();

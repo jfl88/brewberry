@@ -1,6 +1,6 @@
 const EventEmitter = require('events');
-class Logger extends EventEmitter {
+class Emitter extends EventEmitter {
 
 };
-var logger = new Logger();
-module.exports = logger;
+var emitter = new Emitter();
+module.exports = emitter;
