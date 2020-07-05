@@ -8,6 +8,7 @@ const http = require('http');
 
 
 var emitter = require('./emitter');
+var logger = require('./logger');
 
 var port = normalizePort(process.env.PORT || webListenPort);
 webapp.set('port', port);
