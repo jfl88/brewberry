@@ -120,7 +120,7 @@ router.post('/brew/', auth, function(req, res, next) {
     complete: (req.body.complete === 'on'),
     startDT: new Date(req.body.startDT),
     finishDT: null
-  } 
+  }
 
   MongoClient.connect(url, {
     useUnifiedTopology: true,
@@ -134,6 +134,19 @@ router.post('/brew/', auth, function(req, res, next) {
       client.close();
     });
   });
+});
+
+router.get('/new/', auth, function(req, res, next) {
+  var newCtrlr = { 
+    id: '',
+    name: '',
+    sensor: {},
+    output: {},
+    updateRate: 1000,
+    param: []
+  }
+  
+  res.render('controller', { title: 'Bellthorpe Brewing - New Controller', controller: newCtrlr });
 });
 
 module.exports = router;

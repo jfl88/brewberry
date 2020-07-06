@@ -1,0 +1,44 @@
+extends layout
+
+block content
+  div
+    .row
+      .col-md-12
+        h2=title
+        hr
+    .row.equal
+      .col-sm-12.col-md-12
+        .panel.panel-default
+          .panel-heading
+            label=controller.name
+          .panel-body
+            p
+              label Model:&nbsp
+              | #{controller.model}
+            p
+              label Update Rate:&nbsp
+              | #{controller.updateRate}
+            if controller.param
+              hr
+              label Controller Parameters:
+              table.table
+                tr
+                  th Name
+                  th Value
+                each item, name in controller.param
+                  tr
+                    td #{name}
+                    td #{item}
+    .row
+      .col-sm-6.col-md-6
+        .panel.panel-default
+          .panel-heading
+            label Sensor
+          .panel-body
+            p no sensor yet
+      .col-sm-6.col-md-6
+          .panel.panel-default
+            .panel-heading
+              label Output
+            .panel-body
+              p no sensor yet
