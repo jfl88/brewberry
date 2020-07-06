@@ -5,6 +5,7 @@ var router = express.Router();
 var dblogin = require('../../config.json');
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
+const logger = require('../../logger');
 var url = 'mongodb://' + dblogin.db_user + ':' + dblogin.db_pw + '@' + dblogin.db_addr;
 
 
@@ -26,8 +27,7 @@ router.get('/:page?', function(req, res, next) {
       .limit(resPerPage)
       .toArray(function(err, docs) {
         assert.equal(err, null);
-        console.log("Found the following records");
-        console.dir(docs)
+        logger.debug('history.js: Found ' + count + ' records');
         res.render('history', { title: 'Bellthorpe Brewing - Brew History', brews: docs, page: page, numPages: Math.ceil(count / resPerPage) });
         client.close();
       });

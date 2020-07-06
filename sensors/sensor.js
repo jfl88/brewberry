@@ -1,5 +1,6 @@
 const SineSim = require('./sineSim');
 const ds18b20 = require('./ds18b20');
+const logger = require('../logger');
 
 class Sensor {
     static newSensor(sensor){
@@ -9,7 +10,7 @@ class Sensor {
             case 'ds18b20':
               return new ds18b20(sensor.id, sensor.name);
             default:
-              console.log("sensor model does not exist");
+              logger.error("sensor.js: sensor model does not exist");
               return undefined;
           }
     }

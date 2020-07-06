@@ -1,5 +1,6 @@
 const SimSwitch = require('./simSwitch');
 const TPLink = require('./tpLink');
+const logger = require('../logger');
 
 class Output {
     static newOutput(output){
@@ -9,7 +10,7 @@ class Output {
             case 'TPLink':
               return new TPLink(output.id, output.name);
             default:
-              console.log("output model does not exist");
+              logger.error('output.js: output model does not exist');
               return undefined;
           }
     }

@@ -59,11 +59,12 @@ function onError(error) {
   // handle specific listen errors with friendly messages
   switch (error.code) {
     case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
+      logger.error('app.js: ' + bind + ' requires elevated privileges');
       process.exit(1);
       break;
     case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
+      
+    logger.error('app.js: ' + bind + ' is already in use');
       process.exit(1);
       break;
     default:
@@ -93,7 +94,7 @@ function init()
       useNewUrlParser: true,
     }, function(err, client) {
       if (err)
-          console.log("Error connecting to mongodb: " + JSON.stringify(err));
+          logger.error('app.js: Error connecting to mongodb: ' + JSON.stringify(err));
       else
           database = client.db();
   });
@@ -105,13 +106,12 @@ function init()
     
     controllers.forEach(function (controller) {
       if (controller.startControl())
-        console.log('started controller: ' + controller.name);
+        logger.info('app.js: started controller: ' + controller.name);
       else
-        console.log('failed to start controller: ' + controller.name);
+        logger.info('app.js: failed to start controller: ' + controller.name);
     });
 
     emitter.on('controllerUpdate', function(controller){
-      //console.log(controller);
       var record = {
         "timestamp": controller.sensor.currentRecord.timestamp,
         "id": controller.id,
@@ -125,34 +125,33 @@ function init()
         database.collection('controllerLog').insertOne(record, (err, result) => {
           
           if (err)
-            console.error('Error writing to collection: ' + err.message)
-          //console.log('New Temp Inserted: ' + JSON.stringify(record));
+            logger.error('app.js: Error writing to collection: ' + err.message)
         });
         database.collection('brews')
           .findOneAndUpdate({ "complete": false}, { $push: { logs: record }}, function(err, r){
             if (err)
-              console.error('Error writing to collection: ' + err.message)
+              logger.error('app.js: Error writing to collection: ' + err.message)
         });
       }
       io.emit('liveTemp', controller);
     });
 
     io.on('connection', function(socket){
-      console.log('someone connected!');
+      logger.info('app.js: someone connected!');
       socket.on('getControllers', function() {
-        console.log('received req for controllers');
+        logger.info('app.js: received req for controllers');
         io.emit('sendControllers', config.controllers);
       });
     });
   } else {
     clientSocket = ioClient('http://' + config.socket_addr + ':' + config.socket_port);
     clientSocket.on('connect', function () { 
-      console.log('connected!');
+      logger.info('app.js: connected!');
       clientSocket.emit('getControllers');
     });
     clientSocket.on('sendControllers', function(data) {
       config.controllers = data;
-      console.log('received ' + config.controllers.length + ' controllers');
+      logger.info('app.js: received ' + config.controllers.length + ' controllers');
       webapp.set('config', config);
     });
   }
@@ -163,14 +162,14 @@ function init()
 
 function shutdown() {
   if (!config.client_only) {
-    console.log('shutting down controllers');
+    logger.info('app.js: shutting down controllers');
     controllers.forEach(function(controller) {
       if (controller.runningState)
         if (controller.stopControl())
-          console.log('failed to stop controller: ' + controller.name); 
+          logger.error('app.js: failed to stop controller: ' + controller.name); 
     });
     
-    console.log('closing sockets');
+    logger.info('app.js: closing sockets');
     io.close();
   }
   if (clientSocket !== undefined)

@@ -36,7 +36,6 @@ router.get('/', auth, function(req, res, next){
 
 /* GET Show brew details for edit EXISTING brew */
 router.get('/brew/:brewid', auth, function(req, res, next) {
-  console.log(req.params.brewid);
   MongoClient.connect(url, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
@@ -52,7 +51,6 @@ router.get('/brew/:brewid', auth, function(req, res, next) {
 
 /* GET Show brew details for edit NEW brew */
 router.get('/brew', auth, function(req, res, next) {
-  console.log(req.params.brewid);
   var newBrew = {
     name : '',
     recipeUrl : '',
@@ -66,7 +64,6 @@ router.get('/brew', auth, function(req, res, next) {
 
 /* POST Handle update data for an EXISTING brew*/
 router.post('/brew/:brewid', auth, function(req, res, next) {
-  console.log(req.body);
   brewUpdate = { $set: {
       name: req.body.name,
       recipeUrl: req.body.recipeUrl,
@@ -92,7 +89,6 @@ router.post('/brew/:brewid', auth, function(req, res, next) {
 
 /* POST Handle update data for a NEW brew */
 router.post('/brew/', auth, function(req, res, next) {
-  console.log(req.body);
   var newBrew = { 
     name: req.body.name,
     recipeUrl: req.body.recipeUrl,
