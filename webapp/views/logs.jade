@@ -21,7 +21,7 @@ block content
               each log in logs
                 tr
                   td #{log.hostname}
-                  td #{moment(log.timestamp).format('DD MMM YYYY h:mm:ss a')}
+                  td #{moment(log.timestamp).tz('America/Vancouver').format('DD MMM YYYY h:mm:ss a')}
                   td #{log.level}
                   td #{log.message}
           .panel-footer
