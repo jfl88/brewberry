@@ -12,7 +12,7 @@ var control = require('./routes/control');
 const logger = require('../logger');
 
 var app = express();
-app.locals.moment = require('moment');
+app.locals.moment = require('moment-timezone');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
