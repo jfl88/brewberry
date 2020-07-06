@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var basicAuth = require('basic-auth');
+const logger = require('../../logger');
 
 // db stuff
 var config = require('../../config.json');
@@ -36,7 +37,6 @@ router.get('/', auth, function(req, res, next){
 
 /* GET Show brew details for edit EXISTING brew */
 router.get('/brew/:brewid', auth, function(req, res, next) {
-  console.log(req.params.brewid);
   MongoClient.connect(url, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
@@ -52,7 +52,6 @@ router.get('/brew/:brewid', auth, function(req, res, next) {
 
 /* GET Show brew details for edit NEW brew */
 router.get('/brew', auth, function(req, res, next) {
-  console.log(req.params.brewid);
   var newBrew = {
     name : '',
     recipeUrl : '',
@@ -64,9 +63,32 @@ router.get('/brew', auth, function(req, res, next) {
   res.render('editbrew', { title: 'Bellthorpe Brewing - Create Brew', brew: newBrew });
 });
 
+router.get('/logs/:page?', auth, function(req, res, next) {
+  const resPerPage = 25; // results per page
+  const page = req.params.page || 1; // Page 
+
+  MongoClient.connect(url, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  }, function(err, client){
+    client.db().collection('log')
+    .countDocuments({}, function(err, count){
+      client.db().collection('log').find()
+      .sort({ timestamp: -1 })
+      .skip(page > 1 ? ((page - 1) * resPerPage) : 0)
+      .limit(resPerPage)
+      .toArray(function(err, docs) {
+        assert.equal(err, null);
+        logger.debug('history.js: Found ' + count + ' records');
+        res.render('logs', { title: 'Bellthorpe Brewing - Logs', logs: docs, page: page, numPages: Math.ceil(count / resPerPage) });
+        client.close();
+      });
+    })
+  });
+});
+
 /* POST Handle update data for an EXISTING brew*/
 router.post('/brew/:brewid', auth, function(req, res, next) {
-  console.log(req.body);
   brewUpdate = { $set: {
       name: req.body.name,
       recipeUrl: req.body.recipeUrl,
@@ -92,7 +114,6 @@ router.post('/brew/:brewid', auth, function(req, res, next) {
 
 /* POST Handle update data for a NEW brew */
 router.post('/brew/', auth, function(req, res, next) {
-  console.log(req.body);
   var newBrew = { 
     name: req.body.name,
     recipeUrl: req.body.recipeUrl,

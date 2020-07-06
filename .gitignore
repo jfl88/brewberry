@@ -62,3 +62,5 @@ typings/
 
 # get rid of garbage OS files
 .DS_Store
+
+.vscode/

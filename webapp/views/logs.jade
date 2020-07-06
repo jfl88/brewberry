@@ -1,0 +1,36 @@
+extends layout
+
+block content
+  div
+    .row
+      .col-md-12
+        h2=title
+        hr
+    .row
+      .col-md-12
+        .panel.panel-default
+          .panel-heading
+            label Log Viewer
+          .panel-body
+            table.table
+              tr
+                th Hostname
+                th Timestamp
+                th Severity
+                th Message
+              each log in logs
+                tr
+                  td #{log.hostname}
+                  td #{moment(log.timestamp).format('DD MMM YYYY h:mm:ss a')}
+                  td #{log.level}
+                  td #{log.message}
+          .panel-footer
+            .row
+              .col-sm-4
+                if page > 1
+                  a(href='/control/logs/' + (parseInt(page) - 1)) Prev Page
+              .col-sm-4.text-center
+                | Page #{page} of #{numPages}
+              .col-sm-4.text-right
+                if page < numPages
+                  a(href='/control/logs/' + (parseInt(page) + 1)) Next Page

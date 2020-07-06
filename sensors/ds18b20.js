@@ -1,4 +1,5 @@
 const sensorLibrary = require('ds18b20');
+const logger = require('../logger');
 
 class ds18b20 {
 
@@ -19,7 +20,7 @@ class ds18b20 {
         try {
             return sensorLibrary.temperatureSync(this.id);
         } catch (err) {
-            console.log(err);
+            logger.error('ds18b20.js: ' + err);
             return false;
         }
     }
