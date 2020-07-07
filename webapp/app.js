@@ -9,6 +9,7 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var history = require('./routes/history');
 var control = require('./routes/control');
+var api = require('./routes/api');
 const logger = require('../logger');
 
 var app = express();
@@ -30,6 +31,7 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/history', history);
 app.use('/control', control);
+app.use('/api', api);
 
 app.use('/init',function (req, res) {
   var config = app.get('config');
