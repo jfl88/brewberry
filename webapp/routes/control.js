@@ -35,34 +35,9 @@ router.get('/', auth, function(req, res, next){
   res.render('control', { title: 'Bellthorpe Brewing - Brewing Control Centre', controllers: config.controllers });
 });
 
-/* GET Show brew details for edit EXISTING brew */
-router.get('/brew/:brewid', auth, function(req, res, next) {
-  MongoClient.connect(url, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  }, function(err, client){
-    client.db().collection('brews')
-    .findOne({ "_id": ObjectId(req.params.brewid)}, function(err, doc) {
-      assert.equal(err, null);
-      res.render('editbrew', { title: 'Bellthorpe Brewing - Edit Brew', brew: doc });
-      client.close();
-    });      
-  });
-});
+// ***** START LOGS PAGE ***** //
 
-/* GET Show brew details for edit NEW brew */
-router.get('/brew', auth, function(req, res, next) {
-  var newBrew = {
-    name : '',
-    recipeUrl : '',
-    tempData : [],
-    complete : false,
-    startDT : '',
-    finishDT : ''
-  }
-  res.render('editbrew', { title: 'Bellthorpe Brewing - Create Brew', brew: newBrew });
-});
-
+/* LOGS - GET EXISTING */
 router.get('/logs/:page?', auth, function(req, res, next) {
   const resPerPage = 25; // results per page
   const page = req.params.page || 1; // Page 
@@ -86,8 +61,39 @@ router.get('/logs/:page?', auth, function(req, res, next) {
     })
   });
 });
+// ***** END LOGS PAGE ***** //
 
-/* POST Handle update data for an EXISTING brew*/
+// ***** START BREW PAGE ***** //
+
+/* BREW - GET EXISTING */
+router.get('/brew/:brewid', auth, function(req, res, next) {
+  MongoClient.connect(url, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  }, function(err, client){
+    client.db().collection('brews')
+    .findOne({ "_id": ObjectId(req.params.brewid)}, function(err, doc) {
+      assert.equal(err, null);
+      res.render('editbrew', { title: 'Bellthorpe Brewing - Edit Brew', brew: doc });
+      client.close();
+    });      
+  });
+});
+
+/* BREW - GET NEW */
+router.get('/brew', auth, function(req, res, next) {
+  var newBrew = {
+    name : '',
+    recipeUrl : '',
+    tempData : [],
+    complete : false,
+    startDT : '',
+    finishDT : ''
+  }
+  res.render('editbrew', { title: 'Bellthorpe Brewing - Create Brew', brew: newBrew });
+});
+
+/* BREW - EDIT EXISTING */
 router.post('/brew/:brewid', auth, function(req, res, next) {
   brewUpdate = { $set: {
       name: req.body.name,
@@ -112,7 +118,7 @@ router.post('/brew/:brewid', auth, function(req, res, next) {
   });
 });
 
-/* POST Handle update data for a NEW brew */
+/* BREW - CREATE NEW */
 router.post('/brew/', auth, function(req, res, next) {
   var newBrew = { 
     name: req.body.name,
@@ -136,7 +142,12 @@ router.post('/brew/', auth, function(req, res, next) {
   });
 });
 
-router.get('/new/', auth, function(req, res, next) {
+// ***** END BREW PAGE ***** //
+
+// ***** START CTRLR PAGE ***** //
+
+/* GET new controller page */
+router.get('/ctrlr', auth, function(req, res, next) {
   var newCtrlr = { 
     id: '',
     name: '',
@@ -148,5 +159,7 @@ router.get('/new/', auth, function(req, res, next) {
   
   res.render('controller', { title: 'Bellthorpe Brewing - New Controller', controller: newCtrlr });
 });
+
+// ***** END CTRLR PAGE ***** //
 
 module.exports = router;
