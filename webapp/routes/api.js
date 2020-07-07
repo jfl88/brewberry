@@ -7,7 +7,7 @@ var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 var url = 'mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr;
 
-router.route('/api/currentbrew')
+router.route('/currentbrew')
   .get(function(req, res, next) {
     MongoClient.connect(url, {
       useUnifiedTopology: true,
@@ -23,7 +23,7 @@ router.route('/api/currentbrew')
     });
   });
 
-router.route('/api/getlogs/:from/:to')
+router.route('/getlogs/:from/:to')
   .get(function(req, res, next) {
     from = new Date(+req.params.from);
     to = new Date(+req.params.to);
@@ -60,7 +60,7 @@ router.route('/api/getlogs/:from/:to')
     });
   });
 
-router.route('/api/brews')
+router.route('/brews')
   .get(function(req, res, next) {
     MongoClient.connect(url, {
       useUnifiedTopology: true,
