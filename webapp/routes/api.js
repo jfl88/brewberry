@@ -60,39 +60,28 @@ router.route('/getlogs/:from/:to')
     });
   });
 
-router.route('/brews')
+router.route('/brews/:page?')
   .get(function(req, res, next) {
+    const resPerPage = 5; // results per page
+    const page = req.params.page || 1; // Page 
+
     MongoClient.connect(url, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
     }, function(err, client){
       client.db().collection('brews')
-      .aggregate(
-        {
-          $lookup: {
-            from: "controllerLog",
-            let: { brewStart: "$startDT", brewEnd: "$finishDT" },
-            pipeline: [
-              {
-                $match: {
-                  $expr: {
-                    $and: [
-                      { $gte: [ "$timestamp", "$$brewStart" ] },
-                      { $lte: [ "$timestamp", "$$brewEnd" ]}
-                    ]
-                  }
-                }
-              }
-            ],
-            as: "newTempData"
-          }
-        }
-      )
-      .toArray(function(err, docs) {
-        assert.equal(err, null);
-        res.json(docs);
-        client.close();
-      });      
+      .countDocuments({}, function(err, count){
+        client.db().collection('brews').find()
+        .sort({ startDT: -1 })
+        .skip(page > 1 ? ((page - 1) * resPerPage) : 0)
+        .limit(resPerPage)
+        .toArray(function(err, docs) {
+          assert.equal(err, null);
+          logger.debug('api.js: Found ' + count + ' brews');
+          res.json(docs);
+          client.close();
+        });
+      })
     });
   });
 
