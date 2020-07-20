@@ -115,7 +115,7 @@ function init()
               config.controllers = docs;
               webapp.set('config', config);
             }
-            client.close();x
+            client.close();
           });
 
           emitter.on('controllerUpdate', function(controller){
