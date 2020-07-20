@@ -107,54 +107,16 @@ function init()
               });
 
               controllers.forEach(function (controller) {
-                if (controller.startControl())
-                  logger.info('app.js: started controller: ' + controller.name);
-                else
-                  logger.info('app.js: failed to start controller: ' + controller.name);
+                if (controller.enabled === true)
+                  if (controller.startControl())
+                    logger.info('app.js: started controller: ' + controller.name);
+                  else
+                    logger.info('app.js: failed to start controller: ' + controller.name);
               });
               config.controllers = docs;
               webapp.set('config', config);
             }
             client.close();
-          });
-
-          emitter.on('controllerUpdate', function(controller){
-            var record = {
-              "timestamp": controller.sensor.currentRecord.timestamp,
-              "id": controller.id,
-              "name": controller.name,
-              "sensorValue": controller.sensor.currentRecord.temp,
-              "outputValue": controller.output.state,
-              "param": controller.param
-            }
-            
-            MongoClient.connect('mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, {
-                useUnifiedTopology: true,
-                useNewUrlParser: true,
-              }, function(err, client) {
-              client.db().collection('controllerLog').insertOne(record, (err, result) => {
-                
-                if (err)
-                  logger.error('app.js: Error writing to collection: ' + err.message)
-              });
-
-              client.db().collection('brews')
-                .findOneAndUpdate({ "complete": false}, { $push: { logs: record }}, function(err, r){
-                  if (err)
-                    logger.error('app.js: Error writing to collection: ' + err.message)
-              });
-              
-              client.close();
-            });
-            io.emit('liveTemp', controller);
-          });
-      
-          io.on('connection', function(socket){
-            logger.info('app.js: someone connected!');
-            socket.on('getControllers', function() {
-              logger.info('app.js: received req for controllers');
-              io.emit('sendControllers', config.controllers);
-            });
           });
         } else {
           clientSocket = ioClient('http://' + config.socket_addr + ':' + config.socket_port);
@@ -168,6 +130,45 @@ function init()
             webapp.set('config', config);
           });
         }
+  });
+
+  emitter.on('controllerUpdate', function(controller){
+    var record = {
+      "timestamp": controller.sensor.currentRecord.timestamp,
+      "id": controller.id,
+      "name": controller.name,
+      "sensorValue": controller.sensor.currentRecord.temp,
+      "outputValue": controller.output.state,
+      "param": controller.param
+    }
+    
+    MongoClient.connect('mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, {
+        useUnifiedTopology: true,
+        useNewUrlParser: true,
+      }, function(err, client) {
+      client.db().collection('controllerLog').insertOne(record, (err, result) => {
+        
+        if (err)
+          logger.error('app.js: Error writing to collection: ' + err.message)
+      });
+
+      client.db().collection('brews')
+        .findOneAndUpdate({ "complete": false}, { $push: { logs: record }}, function(err, r){
+          if (err)
+            logger.error('app.js: Error writing to collection: ' + err.message)
+      });
+      
+      client.close();
+    });
+    io.emit('liveTemp', controller);
+  });
+
+  io.on('connection', function(socket){
+    logger.info('app.js: someone connected!');
+    socket.on('getControllers', function() {
+      logger.info('app.js: received req for controllers');
+      io.emit('sendControllers', config.controllers);
+    });
   });
 
   server.listen(port);

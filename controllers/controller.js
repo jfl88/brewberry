@@ -9,9 +9,9 @@ class Controller {
     logger.debug('controller.js: \n%o', controller);
     switch (controller.model){
       case 'ReadOnly':
-        return new ReadOnly(controller.id, controller.name, Sensor.newSensor(controller.sensor), controller.output, controller.updateRate, controller.param);
+        return new ReadOnly(controller.id, controller.name, controller.enabled, Sensor.newSensor(controller.sensor), controller.output, controller.updateRate, controller.param);
       case 'Hysteresis':
-        return new Hysteresis(controller.id, controller.name, Sensor.newSensor(controller.sensor), Output.newOutput(controller.output), controller.updateRate, controller.param);
+        return new Hysteresis(controller.id, controller.name, controller.enabled, Sensor.newSensor(controller.sensor), Output.newOutput(controller.output), controller.updateRate, controller.param);
       default:
         logger.error('controller.js: controller model' & controller.model & 'does not exist');
         return undefined;

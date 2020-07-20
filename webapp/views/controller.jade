@@ -14,6 +14,9 @@ block content
             label=controller.name
           .panel-body
             p
+                label Enabled: 
+                input.form-control(type='checkbox', name='enabled', checked=controller.enabled)
+            p
               label Model:&nbsp
               input.form-control(type='text', name='model', value=controller.model)
             p

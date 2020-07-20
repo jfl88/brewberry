@@ -19,6 +19,9 @@ block content
                   a(href='/control/ctrlr/' + controller._id) Edit Controller
             .panel-body
               p
+                label Enabled: 
+                input.form-control(type='checkbox', name='enabled', checked=controller.enabled)
+              p
                 label Model:&nbsp
                 | #{controller.model}
               p

@@ -2,10 +2,11 @@ const emitter = require('../emitter');
 const logger = require('../logger');
 
 class ReadOnly {
-  constructor(id, name, sensor, output, updateRate, param) {
+  constructor(id, name, enabled, sensor, output, updateRate, param) {
     // standard members
     this.id = id;
     this.name = name;
+    this.enabled = enabled;
     this.type = "Sensor Only";
 
     this.sensor = sensor;
