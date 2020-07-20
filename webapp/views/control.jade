@@ -31,10 +31,10 @@ block content
               p
                 label Output:&nbsp
                 | #{controller.output.name}
-              if controller.param
-              hr
-              label Controller Parameters:
-              table.table
+            if Object.keys(controller.param).length > 0
+              .panel-heading
+                label Parameters:
+              table.table.table-bordered
                 tr
                   th Name
                   th Value

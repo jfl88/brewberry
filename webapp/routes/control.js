@@ -147,17 +147,29 @@ router.post('/brew/', auth, function(req, res, next) {
 // ***** START CTRLR PAGE ***** //
 
 /* GET new controller page */
-router.get('/ctrlr', auth, function(req, res, next) {
-  var newCtrlr = { 
-    id: '',
-    name: '',
-    sensor: {},
-    output: {},
-    updateRate: 1000,
-    param: []
-  }
-  
-  res.render('controller', { title: 'Bellthorpe Brewing - New Controller', controller: newCtrlr });
+router.get('/ctrlr/:id?', auth, function(req, res, next) {
+  if (!req.params.id) {
+    var controller = { 
+      id: '',
+      name: '',
+      sensor: {},
+      output: {},
+      updateRate: 1000,
+      param: []
+    }
+    res.render('controller', { title: 'Bellthorpe Brewing - New Controller', controller: controller });
+  } else
+    MongoClient.connect(url, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    }, function(err, client){
+      client.db().collection('controllers')
+      .findOne({ "_id": ObjectId(req.params.id)}, function(err, doc) {
+        assert.equal(err, null);
+        res.render('controller', { title: 'Bellthorpe Brewing - New Controller', controller: doc });
+        client.close();
+      });      
+    });
 });
 
 // ***** END CTRLR PAGE ***** //

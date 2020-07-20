@@ -2,12 +2,13 @@ extends layout
 
 block content
   div
+    form.form-horizontal(action='/control/ctrlr/' + (controller._id ? controller._id : ''), method='post')
     .row
       .col-md-12
         h2=title
         hr
     .row.equal
-      .col-sm-12.col-md-12
+      .col-sm-4.col-md-4
         .panel.panel-default
           .panel-heading
             label=controller.name
@@ -18,25 +19,21 @@ block content
             p
               label Update Rate:&nbsp
               input.form-control(type='text', name='updateRate', value=controller.updateRate)
-            if controller.param
-              hr
-              label Controller Parameters:
-              table.table
-                tr
-                  th Name
-                  th Value
-                each item, name in controller.param
-                  tr
-                    td #{name}
-                    td #{item}
-    .row
-      .col-sm-6.col-md-6
+          if Object.keys(controller.param).length > 0
+            .panel-heading
+              label Parameters:
+            .panel-body
+              each item, name in controller.param
+                .form-group
+                  label.control-label #{name}
+                  input.form-control(type='text', name='updateRate', value=item)
+      .col-sm-4.col-md-4
         .panel.panel-default
           .panel-heading
             label Sensor
           .panel-body
             p no sensor yet
-      .col-sm-6.col-md-6
+      .col-sm-4.col-md-4
           .panel.panel-default
             .panel-heading
               label Output
