@@ -96,16 +96,16 @@ function init()
       if (err)
           logger.error('app.js: Error connecting to mongodb: ' + JSON.stringify(err));
       else
-        if (!config.client_only) {
-          client.db().collection('controllers').find()
-          .toArray(function(err, docs) {
-            assert.equal(err, null);
-            logger.debug('app.js: Found ' + docs.length + ' controllers');
-            if (docs.length > 0) {
-              docs.forEach(function (controller){
-                controllers.push(Controller.newController(controller));
-              });
+        client.db().collection('controllers').find()
+        .toArray(function(err, docs) {
+          assert.equal(err, null);
+          logger.debug('app.js: Found ' + docs.length + ' controllers');
+          if (docs.length > 0) {
+            docs.forEach(function (controller){
+              controllers.push(Controller.newController(controller));
+            });
 
+            if (!config.client_only)
               controllers.forEach(function (controller) {
                 if (controller.enabled === true)
                   if (controller.startControl())
@@ -113,23 +113,11 @@ function init()
                   else
                     logger.info('app.js: failed to start controller: ' + controller.name);
               });
-              config.controllers = docs;
-              webapp.set('config', config);
-            }
-            client.close();
-          });
-        } else {
-          clientSocket = ioClient('http://' + config.socket_addr + ':' + config.socket_port);
-          clientSocket.on('connect', function () { 
-            logger.info('app.js: connected!');
-            clientSocket.emit('getControllers');
-          });
-          clientSocket.on('sendControllers', function(data) {
-            config.controllers = data;
-            logger.info('app.js: received ' + config.controllers.length + ' controllers');
-            webapp.set('config', config);
-          });
-        }
+          }
+          config.controllers = docs;
+          webapp.set('config', config);
+          client.close();
+        });
   });
 
   emitter.on('controllerUpdate', function(controller){
