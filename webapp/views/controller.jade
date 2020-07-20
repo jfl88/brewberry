@@ -14,10 +14,10 @@ block content
           .panel-body
             p
               label Model:&nbsp
-              | #{controller.model}
+              input.form-control(type='text', name='model', value=controller.model)
             p
               label Update Rate:&nbsp
-              | #{controller.updateRate}
+              input.form-control(type='text', name='updateRate', value=controller.updateRate)
             if controller.param
               hr
               label Controller Parameters:
