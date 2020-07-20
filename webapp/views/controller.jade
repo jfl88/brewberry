@@ -13,14 +13,14 @@ block content
           .panel-heading
             label=controller.name
           .panel-body
-            p
-                label Enabled: 
+            p.input-group
+                span.input-group-addon Enabled: 
                 input.form-control(type='checkbox', name='enabled', checked=controller.enabled)
-            p
-              label Model:&nbsp
+            p.input-group
+              span.input-group-addon Model:
               input.form-control(type='text', name='model', value=controller.model)
-            p
-              label Update Rate:&nbsp
+            p.input-group
+              span.input-group-addon Update Rate:&nbsp
               input.form-control(type='text', name='updateRate', value=controller.updateRate)
           if Object.keys(controller.param).length > 0
             .panel-heading
