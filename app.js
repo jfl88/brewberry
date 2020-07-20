@@ -9,6 +9,7 @@ const http = require('http');
 
 var emitter = require('./emitter');
 var logger = require('./logger');
+var assert = require('assert');
 
 var port = normalizePort(process.env.PORT || webListenPort);
 webapp.set('port', port);
@@ -85,7 +86,6 @@ function onListening() {
 }
 
 const MongoClient = require('mongodb').MongoClient;
-var database;
 
 function init()
 {
@@ -96,65 +96,80 @@ function init()
       if (err)
           logger.error('app.js: Error connecting to mongodb: ' + JSON.stringify(err));
       else
-          database = client.db();
+        if (!config.client_only) {
+          client.db().collection('controllers').find()
+          .toArray(function(err, docs) {
+            assert.equal(err, null);
+            logger.debug('app.js: Found ' + docs.length + ' controllers');
+            if (docs.length > 0) {
+              docs.forEach(function (controller){
+                controllers.push(Controller.newController(controller));
+              });
+
+              controllers.forEach(function (controller) {
+                if (controller.startControl())
+                  logger.info('app.js: started controller: ' + controller.name);
+                else
+                  logger.info('app.js: failed to start controller: ' + controller.name);
+              });
+              config.controllers = docs;
+              webapp.set('config', config);
+            }
+            client.close();x
+          });
+
+          emitter.on('controllerUpdate', function(controller){
+            var record = {
+              "timestamp": controller.sensor.currentRecord.timestamp,
+              "id": controller.id,
+              "name": controller.name,
+              "sensorValue": controller.sensor.currentRecord.temp,
+              "outputValue": controller.output.state,
+              "param": controller.param
+            }
+            
+            MongoClient.connect('mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, {
+                useUnifiedTopology: true,
+                useNewUrlParser: true,
+              }, function(err, client) {
+              client.db().collection('controllerLog').insertOne(record, (err, result) => {
+                
+                if (err)
+                  logger.error('app.js: Error writing to collection: ' + err.message)
+              });
+
+              client.db().collection('brews')
+                .findOneAndUpdate({ "complete": false}, { $push: { logs: record }}, function(err, r){
+                  if (err)
+                    logger.error('app.js: Error writing to collection: ' + err.message)
+              });
+              
+              client.close();
+            });
+            io.emit('liveTemp', controller);
+          });
+      
+          io.on('connection', function(socket){
+            logger.info('app.js: someone connected!');
+            socket.on('getControllers', function() {
+              logger.info('app.js: received req for controllers');
+              io.emit('sendControllers', config.controllers);
+            });
+          });
+        } else {
+          clientSocket = ioClient('http://' + config.socket_addr + ':' + config.socket_port);
+          clientSocket.on('connect', function () { 
+            logger.info('app.js: connected!');
+            clientSocket.emit('getControllers');
+          });
+          clientSocket.on('sendControllers', function(data) {
+            config.controllers = data;
+            logger.info('app.js: received ' + config.controllers.length + ' controllers');
+            webapp.set('config', config);
+          });
+        }
   });
 
-  if (!config.client_only) {
-    config.controllers.forEach(function (controller){
-      controllers.push(Controller.newController(controller));
-    });
-    
-    controllers.forEach(function (controller) {
-      if (controller.startControl())
-        logger.info('app.js: started controller: ' + controller.name);
-      else
-        logger.info('app.js: failed to start controller: ' + controller.name);
-    });
-
-    emitter.on('controllerUpdate', function(controller){
-      var record = {
-        "timestamp": controller.sensor.currentRecord.timestamp,
-        "id": controller.id,
-        "name": controller.name,
-        "sensorValue": controller.sensor.currentRecord.temp,
-        "outputValue": controller.output.state,
-        "param": controller.param
-      }
-      
-      if (database) {
-        database.collection('controllerLog').insertOne(record, (err, result) => {
-          
-          if (err)
-            logger.error('app.js: Error writing to collection: ' + err.message)
-        });
-        database.collection('brews')
-          .findOneAndUpdate({ "complete": false}, { $push: { logs: record }}, function(err, r){
-            if (err)
-              logger.error('app.js: Error writing to collection: ' + err.message)
-        });
-      }
-      io.emit('liveTemp', controller);
-    });
-
-    io.on('connection', function(socket){
-      logger.info('app.js: someone connected!');
-      socket.on('getControllers', function() {
-        logger.info('app.js: received req for controllers');
-        io.emit('sendControllers', config.controllers);
-      });
-    });
-  } else {
-    clientSocket = ioClient('http://' + config.socket_addr + ':' + config.socket_port);
-    clientSocket.on('connect', function () { 
-      logger.info('app.js: connected!');
-      clientSocket.emit('getControllers');
-    });
-    clientSocket.on('sendControllers', function(data) {
-      config.controllers = data;
-      logger.info('app.js: received ' + config.controllers.length + ' controllers');
-      webapp.set('config', config);
-    });
-  }
   server.listen(port);
   server.on('error', onError);
   server.on('listening', onListening);
