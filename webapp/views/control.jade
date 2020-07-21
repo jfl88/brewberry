@@ -8,41 +8,41 @@ block content
           span.pull-right
             a(href='/control/ctrlr/') New Controller
         hr
-    .row.equal
-    if controllers.length > 0
-      each controller in controllers
-        .col-sm-6.col-md-6
-          .panel.panel-default
-            .panel-heading
-              label=controller.name
-              span.pull-right
-                  a(href='/control/ctrlr/' + controller._id) Edit Controller
-            .panel-body
-              p
-                label.control-label Enabled:&nbsp
-                | #{controller.enabled}
-              p
-                label Model:&nbsp
-                | #{controller.model}
-              p
-                label Update Rate:&nbsp
-                | #{controller.updateRate}
-              hr
-              p
-                label Sensor:&nbsp
-                | #{controller.sensor.name}
-              p
-                label Output:&nbsp
-                | #{controller.output.name}
-            if Object.keys(controller.param).length > 0
+    .row
+      if controllers.length > 0
+        each controller in controllers
+          .col-sm-6.col-md-6
+            .panel.panel-default
               .panel-heading
-                label Parameters:
-              table.table.table-bordered
-                tr
-                  th Name
-                  th Value
-                each item, name in controller.param
+                label=controller.name
+                span.pull-right
+                    a(href='/control/ctrlr/' + controller._id) Edit Controller
+              .panel-body
+                p
+                  label.control-label Enabled:&nbsp
+                  | #{controller.enabled}
+                p
+                  label Model:&nbsp
+                  | #{controller.model}
+                p
+                  label Update Rate:&nbsp
+                  | #{controller.updateRate}
+                hr
+                p
+                  label Sensor:&nbsp
+                  | #{controller.sensor.name}
+                p
+                  label Output:&nbsp
+                  | #{controller.output.name}
+              if Object.keys(controller.param).length > 0
+                .panel-heading
+                  label Parameters:
+                table.table.table-bordered
                   tr
-                    td #{name}
-                    td #{item}
+                    th Name
+                    th Value
+                  each item, name in controller.param
+                    tr
+                      td #{name}
+                      td #{item}
 
