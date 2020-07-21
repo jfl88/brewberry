@@ -32,7 +32,7 @@ var auth = function (req, res, next) {
 // Display Control Panel page
 router.get('/', auth, function(req, res, next){
   
-  res.render('control', { title: 'Bellthorpe Brewing - Brewing Control Centre', controllers: config.controllers });
+  res.render('control', { app_name: config.app_name, title: 'Brewing Control Centre', controllers: config.controllers });
 });
 
 // ***** START LOGS PAGE ***** //
@@ -55,7 +55,7 @@ router.get('/logs/:page?', auth, function(req, res, next) {
       .toArray(function(err, docs) {
         assert.equal(err, null);
         logger.debug('history.js: Found ' + count + ' records');
-        res.render('logs', { title: 'Bellthorpe Brewing - Logs', logs: docs, page: page, numPages: Math.ceil(count / resPerPage) });
+        res.render('logs', { app_name: config.app_name, title: 'Logs', logs: docs, page: page, numPages: Math.ceil(count / resPerPage) });
         client.close();
       });
     })
@@ -74,7 +74,7 @@ router.get('/brew/:brewid', auth, function(req, res, next) {
     client.db().collection('brews')
     .findOne({ "_id": ObjectId(req.params.brewid)}, function(err, doc) {
       assert.equal(err, null);
-      res.render('editbrew', { title: 'Bellthorpe Brewing - Edit Brew', brew: doc });
+      res.render('editbrew', { app_name: config.app_name, title: 'Edit Brew', brew: doc });
       client.close();
     });      
   });
@@ -90,7 +90,7 @@ router.get('/brew', auth, function(req, res, next) {
     startDT : '',
     finishDT : ''
   }
-  res.render('editbrew', { title: 'Bellthorpe Brewing - Create Brew', brew: newBrew });
+  res.render('editbrew', { app_name: config.app_name, title: 'Create Brew', brew: newBrew });
 });
 
 /* BREW - EDIT EXISTING */
@@ -112,7 +112,7 @@ router.post('/brew/:brewid', auth, function(req, res, next) {
     .findOneAndUpdate({ "_id": ObjectId(req.params.brewid)}, brewUpdate, { returnOriginal: false }, function(err, r){
       assert.equal(null, err);
 
-      res.render('editbrew', { title: 'Bellthorpe Brewing - Brewing Control Centre', brew: r.value, update: true });
+      res.render('editbrew', { app_name: config.app_name, title: 'Brewing Control Centre', brew: r.value, update: true });
       client.close();
     });
   });
@@ -136,7 +136,7 @@ router.post('/brew/', auth, function(req, res, next) {
     .insertOne(newBrew, function(err, r){
       assert.equal(null, err);
 
-      res.render('editbrew', { title: 'Bellthorpe Brewing - Brewing Control Centre', brew: newBrew._id, update: true });
+      res.render('editbrew', { app_name: config.app_name, title: 'Brewing Control Centre', brew: newBrew._id, update: true });
       client.close();
     });
   });
@@ -152,12 +152,14 @@ router.get('/ctrlr/:id?', auth, function(req, res, next) {
     var controller = { 
       id: '',
       name: '',
+      model: '',
+      enabled: false,
       sensor: {},
       output: {},
       updateRate: 1000,
       param: []
     }
-    res.render('controller', { title: 'Bellthorpe Brewing - New Controller', controller: controller });
+    res.render('controller', { app_name: config.app_name, title: 'New Controller', controller: controller });
   } else
     MongoClient.connect(url, {
       useUnifiedTopology: true,
@@ -166,7 +168,7 @@ router.get('/ctrlr/:id?', auth, function(req, res, next) {
       client.db().collection('controllers')
       .findOne({ "_id": ObjectId(req.params.id)}, function(err, doc) {
         assert.equal(err, null);
-        res.render('controller', { title: 'Bellthorpe Brewing - New Controller', controller: doc });
+        res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: doc });
         client.close();
       });      
     });

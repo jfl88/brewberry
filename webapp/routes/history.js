@@ -2,11 +2,11 @@ var express = require('express');
 var router = express.Router();
 
 // db stuff
-var dblogin = require('../../config.json');
+var config = require('../../config.json');
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 const logger = require('../../logger');
-var url = 'mongodb://' + dblogin.db_user + ':' + dblogin.db_pw + '@' + dblogin.db_addr;
+var url = 'mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr;
 
 
 
@@ -28,7 +28,7 @@ router.get('/:page?', function(req, res, next) {
       .toArray(function(err, docs) {
         assert.equal(err, null);
         logger.debug('history.js: Found ' + count + ' records');
-        res.render('history', { title: 'Bellthorpe Brewing - Brew History', brews: docs, page: page, numPages: Math.ceil(count / resPerPage) });
+        res.render('history', { app_name: config.app_name, title: 'Brew History', brews: docs, page: page, numPages: Math.ceil(count / resPerPage) });
         client.close();
       });
     })

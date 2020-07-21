@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Bellthorpe Brewing' });
+  res.render('index', { app_name: req.app.get('config').app_name, title: 'Bellthorpe Brewing' });
 });
 
 module.exports = router;
