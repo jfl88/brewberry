@@ -87,7 +87,7 @@ function onListening() {
 
 const MongoClient = require('mongodb').MongoClient;
 
-function init()
+function startControllers()
 {
   MongoClient.connect('mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, {
       useUnifiedTopology: true,
@@ -119,36 +119,60 @@ function init()
           client.close();
         });
   });
+}
 
-  emitter.on('controllerUpdate', function(controller){
-    var record = {
-      "timestamp": controller.sensor.currentRecord.timestamp,
-      "id": controller.id,
-      "name": controller.name,
-      "sensorValue": controller.sensor.currentRecord.temp,
-      "outputValue": controller.output.state,
-      "param": controller.param
-    }
-    
-    MongoClient.connect('mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, {
-        useUnifiedTopology: true,
-        useNewUrlParser: true,
-      }, function(err, client) {
-      client.db().collection('controllerLog').insertOne(record, (err, result) => {
-        
+function refreshController(controller) {
+  var record = {
+    "timestamp": controller.sensor.currentRecord.timestamp,
+    "id": controller.id,
+    "name": controller.name,
+    "sensorValue": controller.sensor.currentRecord.temp,
+    "outputValue": controller.output.state,
+    "param": controller.param
+  }
+  
+  MongoClient.connect('mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    }, function(err, client) {
+    client.db().collection('controllerLog').insertOne(record, (err, result) => {
+      
+      if (err)
+        logger.error('app.js: Error writing to collection: ' + err.message)
+    });
+
+    client.db().collection('brews')
+      .findOneAndUpdate({ "complete": false}, { $push: { logs: record }}, function(err, r){
         if (err)
           logger.error('app.js: Error writing to collection: ' + err.message)
-      });
-
-      client.db().collection('brews')
-        .findOneAndUpdate({ "complete": false}, { $push: { logs: record }}, function(err, r){
-          if (err)
-            logger.error('app.js: Error writing to collection: ' + err.message)
-      });
-      
-      client.close();
     });
-    io.emit('liveTemp', controller);
+    
+    client.close();
+  });
+  io.emit('liveTemp', controller);
+}
+
+function stopControllers() {
+  logger.info('app.js: shutting down controllers');
+    controllers.forEach(function(controller) {
+      if (controller.runningState)
+        if (controller.stopControl())
+          logger.error('app.js: failed to stop controller: ' + controller.name);
+        delete controller;
+    });
+    controllers = [];
+}
+
+function startup() {
+  startControllers();
+
+  emitter.on('controllerUpdate', function(controller){
+    refreshController(controller);
+  });
+
+  emitter.on('controllerReload', function(){
+    stopControllers();
+    startControllers();
   });
 
   io.on('connection', function(socket){
@@ -166,12 +190,7 @@ function init()
 
 function shutdown() {
   if (!config.client_only) {
-    logger.info('app.js: shutting down controllers');
-    controllers.forEach(function(controller) {
-      if (controller.runningState)
-        if (controller.stopControl())
-          logger.error('app.js: failed to stop controller: ' + controller.name); 
-    });
+    stopControllers();
     
     logger.info('app.js: closing sockets');
     io.close();
@@ -184,4 +203,4 @@ function shutdown() {
 // catch ctrl+c event and exit normally
 process.on('SIGINT', shutdown);
 
-init();
+startup();

@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var basicAuth = require('basic-auth');
 const logger = require('../../logger');
+const emitter = require('../../emitter');
 
 // db stuff
 var config = require('../../config.json');
@@ -172,6 +173,12 @@ router.get('/ctrlr/:id?', auth, function(req, res, next) {
         client.close();
       });      
     });
+});
+
+router.post('/ctrlr/:id?', auth, function(req, res, next) {
+  console.dir(req);
+  emitter.emit('controllerReload');
+  res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: {} });
 });
 
 // ***** END CTRLR PAGE ***** //
