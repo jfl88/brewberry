@@ -29,11 +29,13 @@ block content
                   | #{controller.updateRate}
                 hr
                 p
-                  label Sensor:&nbsp
-                  | #{controller.sensor.name}
+                  if controller.sensor
+                    label Sensor:&nbsp
+                    | #{controller.sensor.name} (#{controller.sensor.model} @ #{controller.sensor.id})
                 p
-                  label Output:&nbsp
-                  | #{controller.output.name}
+                  if controller.output
+                    label Output:&nbsp
+                    | #{controller.output.name} (#{controller.output.model} @ #{controller.output.id})
               if Object.keys(controller.param).length > 0
                 .panel-heading
                   label Parameters:
