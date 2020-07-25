@@ -55,7 +55,7 @@ router.get('/logs/:page?', auth, function(req, res, next) {
       .limit(resPerPage)
       .toArray(function(err, docs) {
         assert.equal(err, null);
-        logger.debug('history.js: Found ' + count + ' records');
+        logger.debug('control.js: Found ' + count + ' records');
         res.render('logs', { app_name: config.app_name, title: 'Logs', logs: docs, page: page, numPages: Math.ceil(count / resPerPage) });
         client.close();
       });
@@ -66,6 +66,7 @@ router.get('/logs/:page?', auth, function(req, res, next) {
 
 // ***** START BREW PAGE ***** //
 
+// @todo combine the param/paramless route methods (like with controller)
 /* BREW - GET EXISTING */
 router.get('/brew/:brewid', auth, function(req, res, next) {
   MongoClient.connect(url, {
@@ -147,11 +148,11 @@ router.post('/brew/', auth, function(req, res, next) {
 
 // ***** START CTRLR PAGE ***** //
 
-/* GET new controller page */
+// @todo add controller templates depending on selected model (prob on client side)
+/* GET controller page */
 router.get('/ctrlr/:id?', auth, function(req, res, next) {
-  if (!req.params.id) {
-    var controller = { 
-      id: '',
+  if (!req.params.id || !ObjectId.isValid(req.params.id)) {
+    var controller = {
       name: '',
       model: '',
       enabled: false,
@@ -175,10 +176,42 @@ router.get('/ctrlr/:id?', auth, function(req, res, next) {
     });
 });
 
+// @todo add controller property validation
+/* POST controller page */
 router.post('/ctrlr/:id?', auth, function(req, res, next) {
-  console.dir(req);
-  emitter.emit('controllerReload');
-  res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: {} });
+  controller = req.body;
+  controller.enabled === "on" ? controller.enabled = true : controller.enabled = false;
+
+  if (!req.params.id || !ObjectId.isValid(req.params.id))
+    MongoClient.connect(url, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    }, function(err, client){
+      client.db().collection('controllers')
+      .insertOne(controller, function(err, r){
+        assert.equal(null, err);
+    
+        logger.info('control.js: Created controller: ' + controller.name + ', reloading controllers.');
+        emitter.emit('controllerReload');
+        res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: controller });
+        client.close();
+      });
+    });
+  else
+    MongoClient.connect(url, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    }, function(err, client){
+      client.db().collection('controllers')
+      .replaceOne({ "_id": ObjectId(req.params.id)}, controller, { returnOriginal: false }, function(err, r){
+        assert.equal(null, err);
+        
+        logger.info('control.js: Updated controller: ' + controller.name + ', reloading controllers.');
+        emitter.emit('controllerReload');
+        res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: controller });
+        client.close();
+      });
+    });
 });
 
 // ***** END CTRLR PAGE ***** //

@@ -18,6 +18,7 @@
     "ds18b20": "^0.1.0",
     "dynamodb": "^1.1.1",
     "express": "^4.16.3",
+    "express-validator": "5.3.1",
     "jade": "^1.11.0",
     "joi": "^13.3.0",
     "moment": "^2.27.0",

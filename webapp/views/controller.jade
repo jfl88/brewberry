@@ -13,8 +13,12 @@ block content
         .col-sm-4.col-md-4
           .panel.panel-default
             .panel-heading
-              label=controller.name
+              label Controller
             .panel-body
+              .form-group
+                label.control-label.col-sm-4 Name:
+                .col-sm-8
+                  input.form-control(type='text', name='name', value=controller.name)
               .form-group
                 label.control-label.col-sm-4 Enabled: 
                 label.col-sm-8
@@ -36,7 +40,7 @@ block content
                   .form-group
                     label.control-label.col-sm-6 #{name}:
                     .col-sm-6
-                      input.form-control(type='text', name='#{name}', value=item)
+                      input.form-control(type='text', name='param[#{name}]', value=item)
         .col-sm-4.col-md-4
           .panel.panel-default
             .panel-heading
@@ -45,16 +49,16 @@ block content
               .form-group
                 label.control-label.col-sm-4 Model:
                 .col-sm-8
-                  select.form-control(name='sensor_model')
+                  select.form-control(name='sensor[model]')
                     option #{controller.sensor.model}
               .form-group
                 label.control-label.col-sm-4 Identifier:
                 .col-sm-8
-                  input.form-control(type='text', name='sensor_id', value=controller.sensor.id)
+                  input.form-control(type='text', name='sensor[id]', value=controller.sensor.id)
               .form-group
                 label.control-label.col-sm-4 Name:
                 .col-sm-8
-                  input.form-control(type='text', name='sensor_name', value=controller.sensor.name)
+                  input.form-control(type='text', name='sensor[name]', value=controller.sensor.name)
         .col-sm-4.col-md-4
             .panel.panel-default
               .panel-heading
@@ -63,13 +67,13 @@ block content
                 .form-group
                   label.control-label.col-sm-4 Model:
                   .col-sm-8
-                    select.form-control(name='output_model')
+                    select.form-control(name='output[model]')
                       option #{controller.output.model}
                 .form-group
                   label.control-label.col-sm-4 Identifier:
                   .col-sm-8
-                    input.form-control(type='text', name='output_id', value=controller.output.id)
+                    input.form-control(type='text', name='output[id]', value=controller.output.id)
                 .form-group
                   label.control-label.col-sm-4 Name:
                   .col-sm-8
-                    input.form-control(type='text', name='output_name', value=controller.output.name)
+                    input.form-control(type='text', name='output[name]', value=controller.output.name)
