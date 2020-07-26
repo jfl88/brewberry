@@ -22,6 +22,7 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+// @todo add compression middleware and a security middleware (helmet or lusca?)
 app.use(morgan('tiny',{ stream: { write: message => logger.debug('webapp/app.js: ' + message) }}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

@@ -107,11 +107,10 @@ function startControllers()
 
             if (!config.client_only)
               controllers.forEach(function (controller) {
-                if (controller.enabled === true) // @todo change logic so enabled toggle only limits output
-                  if (controller.startControl())
-                    logger.info('app.js: started controller: ' + controller.name);
-                  else
-                    logger.info('app.js: failed to start controller: ' + controller.name);
+                if (controller.startControl())
+                  logger.info('app.js: started controller: ' + controller.name);
+                else
+                  logger.info('app.js: failed to start controller: ' + controller.name);
               });
           }
           config.controllers = docs;

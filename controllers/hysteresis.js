@@ -30,10 +30,11 @@ class Hysteresis {
       this.sensor.currentRecord.timestamp = new Date();
     
       if (this.sensor.lastRecord.temp != this.sensor.currentRecord.temp) {
-        if (!this.output.state && this.sensor.currentRecord.temp > (this.param.setpoint + this.param.onDeadband) && (this.output.lastSwitched + this.param.minOffTime * 1000) < this.sensor.currentRecord.timestamp)
-          this.output.outputOn();
-        else if (this.output.state && this.sensor.currentRecord.temp < (this.param.setpoint + this.param.offDeadband) && (this.output.lastSwitched + this.param.minOnTime * 1000) < this.sensor.currentRecord.timestamp)
-          this.output.outputOff();
+        if (this.enabled)
+          if (!this.output.state && this.sensor.currentRecord.temp > (this.param.setpoint + this.param.onDeadband) && (this.output.lastSwitched + this.param.minOffTime * 1000) < this.sensor.currentRecord.timestamp)
+            this.output.outputOn();
+          else if (this.output.state && this.sensor.currentRecord.temp < (this.param.setpoint + this.param.offDeadband) && (this.output.lastSwitched + this.param.minOnTime * 1000) < this.sensor.currentRecord.timestamp)
+            this.output.outputOff();
         
         emitter.emit('controllerUpdate', this);
       }
