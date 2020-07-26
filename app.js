@@ -172,8 +172,12 @@ function startup() {
   });
 
   emitter.on('controllerReload', function(){
-    stopControllers();
-    startControllers();
+    if (!config.client_only) {
+      stopControllers();
+      startControllers();
+    } else {
+      clientSocket.emit('reloadControllers');
+    }
   });
 
   io.on('connection', function(socket){
@@ -182,7 +186,17 @@ function startup() {
       logger.info('app.js: received req for controllers');
       io.emit('sendControllers', config.controllers);
     });
+    socket.on('reloadControllers', function () {
+      emitter.emit('controllerReload');
+    });
   });
+
+  if (config.client_only) {
+    clientSocket = ioClient('http://' + config.socket_addr + ':' + config.socket_port);
+    clientSocket.on('connect', function () { 
+      logger.info('app.js: connected!');
+    });
+  }
 
   server.listen(port);
   server.on('error', onError);
