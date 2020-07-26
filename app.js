@@ -141,7 +141,7 @@ function refreshController(controller) {
     });
 
     client.db().collection('brews')
-      .findOneAndUpdate({ "complete": false}, { $push: { logs: record }}, function(err, r){
+      .findOneAndUpdate({ "complete": false }, { $push: { logs: record }}, function(err, r){
         if (err)
           logger.error('app.js: Error writing to collection: ' + err.message)
     });
@@ -152,7 +152,8 @@ function refreshController(controller) {
 }
 
 function stopControllers() {
-  logger.info('app.js: shutting down controllers');
+  if (!config.client_only) {
+    logger.info('app.js: shutting down controllers');
     controllers.forEach(function(controller) {
       if (controller.runningState)
         if (controller.stopControl())
@@ -160,6 +161,7 @@ function stopControllers() {
         delete controller;
     });
     controllers = [];
+  }
 }
 
 function startup() {
