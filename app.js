@@ -194,7 +194,7 @@ function startup() {
   if (config.client_only) {
     clientSocket = ioClient('http://' + config.socket_addr + ':' + config.socket_port);
     clientSocket.on('connect', function () { 
-      logger.info('app.js: connected!');
+      logger.info('app.js: connected as a client only to the mothership!');
     });
   }
 
