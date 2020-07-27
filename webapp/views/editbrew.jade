@@ -4,7 +4,7 @@ block content
   div
     .row
       .col-md-12
-        h2=title
+        h4=title
         hr
     if update    
       .row
@@ -23,7 +23,7 @@ block content
                   input.form-control(type='text', name='name', value=brew.name)
               .form-group
                 label.control-label.col-sm-2 Recipe Url:
-                .col-sm-10
+                .col-sm-10  
                   input.form-control(type='text', name='recipeUrl', value=brew.recipeUrl)
               // @todo add datetimepickers for start and end timestamps
               .form-group

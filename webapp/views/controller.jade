@@ -1,0 +1,83 @@
+extends layout
+
+block content
+  div
+    form.form-horizontal(action='/control/ctrlr/' + (controller._id ? controller._id : ''), method='post')
+      .row
+        .col-sm-6
+          h4=title
+        .col-sm-6
+          .form-group.pull-right
+            input.btn.btn-link(type='submit', value='Save')
+      .row
+        .col-sm-4.col-md-4
+          .panel.panel-default
+            .panel-heading
+              label Controller
+            .panel-body
+              .form-group
+                label.control-label.col-sm-4 ID:
+                .col-sm-8
+                  input.form-control(type='text', name='id', value=controller.id readonly)
+              .form-group
+                label.control-label.col-sm-4 Name:
+                .col-sm-8
+                  input.form-control(type='text', name='name', value=controller.name)
+              .form-group
+                label.control-label.col-sm-4 Enabled: 
+                label.col-sm-8
+                  input.form-control(type='checkbox', name='enabled', checked=controller.enabled)
+              .form-group
+                label.control-label.col-sm-4 Model:
+                .col-sm-8
+                  select.form-control(name='model')
+                    option #{controller.model}
+              .form-group
+                label.control-label.col-sm-4 Update Rate:
+                .col-sm-8
+                  input.form-control(type='text', name='updateRate', value=controller.updateRate)
+            if Object.keys(controller.param).length > 0
+              .panel-heading
+                label Parameters:
+              .panel-body
+                each item, name in controller.param
+                  .form-group
+                    label.control-label.col-sm-6 #{name}:
+                    .col-sm-6
+                      input.form-control(type='text', name='param[#{name}]', value=item)
+        .col-sm-4.col-md-4
+          .panel.panel-default
+            .panel-heading
+              label Sensor
+            .panel-body
+              .form-group
+                label.control-label.col-sm-4 Model:
+                .col-sm-8
+                  select.form-control(name='sensor[model]')
+                    option #{controller.sensor.model}
+              .form-group
+                label.control-label.col-sm-4 Identifier:
+                .col-sm-8
+                  input.form-control(type='text', name='sensor[id]', value=controller.sensor.id)
+              .form-group
+                label.control-label.col-sm-4 Name:
+                .col-sm-8
+                  input.form-control(type='text', name='sensor[name]', value=controller.sensor.name)
+        .col-sm-4.col-md-4
+            .panel.panel-default
+              .panel-heading
+                label Output
+              .panel-body
+                .form-group
+                  label.control-label.col-sm-4 Model:
+                  .col-sm-8
+                    select.form-control(name='output[model]')
+                      option #{controller.output.model}
+                .form-group
+                  label.control-label.col-sm-4 Identifier:
+                  .col-sm-8
+                    input.form-control(type='text', name='output[id]', value=controller.output.id)
+                .form-group
+                  label.control-label.col-sm-4 Name:
+                  .col-sm-8
+                    input.form-control(type='text', name='output[name]', value=controller.output.name)

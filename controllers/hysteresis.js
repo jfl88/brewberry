@@ -2,10 +2,11 @@ const emitter = require('../emitter');
 const logger = require('../logger');
 
 class Hysteresis {
-  constructor(id, name, sensor, output, updateRate, param) {
+  constructor(id, name, enabled,sensor, output, updateRate, param) {
     // standard members
     this.id = id;
     this.name = name;
+    this.enabled = enabled;
     this.type = "Hysteresis";
 
     this.sensor = sensor;
@@ -29,10 +30,11 @@ class Hysteresis {
       this.sensor.currentRecord.timestamp = new Date();
     
       if (this.sensor.lastRecord.temp != this.sensor.currentRecord.temp) {
-        if (!this.output.state && this.sensor.currentRecord.temp > (this.param.setpoint + this.param.onDeadband) && (this.output.lastSwitched + this.param.minOffTime * 1000) < this.sensor.currentRecord.timestamp)
-          this.output.outputOn();
-        else if (this.output.state && this.sensor.currentRecord.temp < (this.param.setpoint + this.param.offDeadband) && (this.output.lastSwitched + this.param.minOnTime * 1000) < this.sensor.currentRecord.timestamp)
-          this.output.outputOff();
+        if (this.enabled)
+          if (!this.output.state && this.sensor.currentRecord.temp > (this.param.setpoint + this.param.onDeadband) && (this.output.lastSwitched + this.param.minOffTime * 1000) < this.sensor.currentRecord.timestamp)
+            this.output.outputOn();
+          else if (this.output.state && this.sensor.currentRecord.temp < (this.param.setpoint + this.param.offDeadband) && (this.output.lastSwitched + this.param.minOnTime * 1000) < this.sensor.currentRecord.timestamp)
+            this.output.outputOff();
         
         emitter.emit('controllerUpdate', this);
       }

@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var basicAuth = require('basic-auth');
 const logger = require('../../logger');
+const emitter = require('../../emitter');
 
 // db stuff
 var config = require('../../config.json');
@@ -13,7 +14,7 @@ var url = 'mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_a
 var auth = function (req, res, next) {
   function unauthorized(res) {
     res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
-    return res.send(401);
+    return res.sendStatus(401);
   };
 
   var user = basicAuth(req);
@@ -32,37 +33,12 @@ var auth = function (req, res, next) {
 // Display Control Panel page
 router.get('/', auth, function(req, res, next){
   
-  res.render('control', { title: 'Bellthorpe Brewing - Brewing Control Centre', controllers: config.controllers });
+  res.render('control', { app_name: config.app_name, title: 'Brewing Control Centre', controllers: config.controllers });
 });
 
-/* GET Show brew details for edit EXISTING brew */
-router.get('/brew/:brewid', auth, function(req, res, next) {
-  MongoClient.connect(url, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  }, function(err, client){
-    client.db().collection('brews')
-    .findOne({ "_id": ObjectId(req.params.brewid)}, function(err, doc) {
-      assert.equal(err, null);
-      res.render('editbrew', { title: 'Bellthorpe Brewing - Edit Brew', brew: doc });
-      client.close();
-    });      
-  });
-});
+// ***** START LOGS PAGE ***** //
 
-/* GET Show brew details for edit NEW brew */
-router.get('/brew', auth, function(req, res, next) {
-  var newBrew = {
-    name : '',
-    recipeUrl : '',
-    tempData : [],
-    complete : false,
-    startDT : '',
-    finishDT : ''
-  }
-  res.render('editbrew', { title: 'Bellthorpe Brewing - Create Brew', brew: newBrew });
-});
-
+/* LOGS - GET EXISTING */
 router.get('/logs/:page?', auth, function(req, res, next) {
   const resPerPage = 25; // results per page
   const page = req.params.page || 1; // Page 
@@ -79,15 +55,47 @@ router.get('/logs/:page?', auth, function(req, res, next) {
       .limit(resPerPage)
       .toArray(function(err, docs) {
         assert.equal(err, null);
-        logger.debug('history.js: Found ' + count + ' records');
-        res.render('logs', { title: 'Bellthorpe Brewing - Logs', logs: docs, page: page, numPages: Math.ceil(count / resPerPage) });
+        logger.debug('control.js: Found ' + count + ' records');
+        res.render('logs', { app_name: config.app_name, title: 'Logs', logs: docs, page: page, numPages: Math.ceil(count / resPerPage) });
         client.close();
       });
     })
   });
 });
+// ***** END LOGS PAGE ***** //
 
-/* POST Handle update data for an EXISTING brew*/
+// ***** START BREW PAGE ***** //
+
+// @todo combine the param/paramless route methods (like with controller)
+/* BREW - GET EXISTING */
+router.get('/brew/:brewid', auth, function(req, res, next) {
+  MongoClient.connect(url, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  }, function(err, client){
+    client.db().collection('brews')
+    .findOne({ "_id": ObjectId(req.params.brewid)}, function(err, doc) {
+      assert.equal(err, null);
+      res.render('editbrew', { app_name: config.app_name, title: 'Edit Brew', brew: doc });
+      client.close();
+    });      
+  });
+});
+
+/* BREW - GET NEW */
+router.get('/brew', auth, function(req, res, next) {
+  var newBrew = {
+    name : '',
+    recipeUrl : '',
+    tempData : [],
+    complete : false,
+    startDT : '',
+    finishDT : ''
+  }
+  res.render('editbrew', { app_name: config.app_name, title: 'Create Brew', brew: newBrew });
+});
+
+/* BREW - EDIT EXISTING */
 router.post('/brew/:brewid', auth, function(req, res, next) {
   brewUpdate = { $set: {
       name: req.body.name,
@@ -106,13 +114,13 @@ router.post('/brew/:brewid', auth, function(req, res, next) {
     .findOneAndUpdate({ "_id": ObjectId(req.params.brewid)}, brewUpdate, { returnOriginal: false }, function(err, r){
       assert.equal(null, err);
 
-      res.render('editbrew', { title: 'Bellthorpe Brewing - Brewing Control Centre', brew: r.value, update: true });
+      res.render('editbrew', { app_name: config.app_name, title: 'Brewing Control Centre', brew: r.value, update: true });
       client.close();
     });
   });
 });
 
-/* POST Handle update data for a NEW brew */
+/* BREW - CREATE NEW */
 router.post('/brew/', auth, function(req, res, next) {
   var newBrew = { 
     name: req.body.name,
@@ -120,7 +128,7 @@ router.post('/brew/', auth, function(req, res, next) {
     complete: (req.body.complete === 'on'),
     startDT: new Date(req.body.startDT),
     finishDT: null
-  } 
+  }
 
   MongoClient.connect(url, {
     useUnifiedTopology: true,
@@ -130,10 +138,82 @@ router.post('/brew/', auth, function(req, res, next) {
     .insertOne(newBrew, function(err, r){
       assert.equal(null, err);
 
-      res.render('editbrew', { title: 'Bellthorpe Brewing - Brewing Control Centre', brew: newBrew._id, update: true });
+      res.render('editbrew', { app_name: config.app_name, title: 'Brewing Control Centre', brew: newBrew._id, update: true });
       client.close();
     });
   });
 });
+
+// ***** END BREW PAGE ***** //
+
+// ***** START CTRLR PAGE ***** //
+
+// @todo add controller templates depending on selected model (prob on client side)
+/* GET controller page */
+router.get('/ctrlr/:id?', auth, function(req, res, next) {
+  if (!req.params.id || !ObjectId.isValid(req.params.id)) {
+    var controller = {
+      name: '',
+      model: '',
+      enabled: false,
+      sensor: {},
+      output: {},
+      updateRate: 1000,
+      param: []
+    }
+    res.render('controller', { app_name: config.app_name, title: 'New Controller', controller: controller });
+  } else
+    MongoClient.connect(url, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    }, function(err, client){
+      client.db().collection('controllers')
+      .findOne({ "_id": ObjectId(req.params.id)}, function(err, doc) {
+        assert.equal(err, null);
+        res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: doc });
+        client.close();
+      });      
+    });
+});
+
+// @todo add controller property validation
+/* POST controller page */
+router.post('/ctrlr/:id?', auth, function(req, res, next) {
+  controller = req.body;
+  controller.enabled === "on" ? controller.enabled = true : controller.enabled = false;
+
+  if (!req.params.id || !ObjectId.isValid(req.params.id))
+    MongoClient.connect(url, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    }, function(err, client){
+      client.db().collection('controllers')
+      .insertOne(controller, function(err, r){
+        assert.equal(null, err);
+    
+        logger.info('control.js: Created controller: ' + controller.name + ', reloading controllers.');
+        emitter.emit('controllerReload');
+        res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: controller });
+        client.close();
+      });
+    });
+  else
+    MongoClient.connect(url, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    }, function(err, client){
+      client.db().collection('controllers')
+      .replaceOne({ "_id": ObjectId(req.params.id)}, controller, { returnOriginal: false }, function(err, r){
+        assert.equal(null, err);
+        
+        logger.info('control.js: Updated controller: ' + controller.name + ', reloading controllers.');
+        emitter.emit('controllerReload');
+        res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: controller });
+        client.close();
+      });
+    });
+});
+
+// ***** END CTRLR PAGE ***** //
 
 module.exports = router;
