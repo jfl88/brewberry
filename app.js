@@ -172,12 +172,10 @@ function startup() {
   });
 
   emitter.on('controllerReload', function(){
-    if (!config.client_only) {
-      stopControllers();
-      startControllers();
-    } else {
+    stopControllers();
+    startControllers();
+    if (config.client_only)
       clientSocket.emit('reloadControllers');
-    }
   });
 
   io.on('connection', function(socket){
