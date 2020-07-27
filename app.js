@@ -148,6 +148,7 @@ function refreshController(controller) {
     
     client.close();
   });
+  // @todo: livetemp should send record instead of controller
   io.emit('liveTemp', controller);
 }
 
