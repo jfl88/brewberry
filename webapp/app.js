@@ -15,6 +15,8 @@ const logger = require('../logger');
 
 var app = express();
 app.locals.moment = require('moment-timezone');
+app.locals.app_ver = require('../package').version;
+// @todo add local for app_name
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
