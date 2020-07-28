@@ -9,7 +9,7 @@ var config = require('../../config.json');
 var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectId;
 var assert = require('assert');
-var url = 'mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr;
+var url = 'mongodb+srv://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr;
 
 var auth = function (req, res, next) {
   function unauthorized(res) {

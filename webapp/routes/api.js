@@ -6,7 +6,7 @@ const logger = require('../../logger');
 var config = require('../../config.json');
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
-var url = 'mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr;
+var url = 'mongodb+srv://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr;
 
 router.route('/currentbrew')
   .get(function(req, res, next) {
