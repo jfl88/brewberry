@@ -12,7 +12,7 @@ const logger = createLogger({
     new transports.Console({ level: 'debug' }),
     new transports.MongoDB({
       level: 'info',
-      db: 'mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr,
+      db: 'mongodb+srv://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr,
       storeHost: true,
       options: {
         poolSize: 2, 

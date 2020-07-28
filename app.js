@@ -89,7 +89,7 @@ const MongoClient = require('mongodb').MongoClient;
 
 function startControllers()
 {
-  MongoClient.connect('mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, {
+  MongoClient.connect('mongodb+srv://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
     }, function(err, client) {
@@ -130,7 +130,7 @@ function refreshController(controller) {
     "param": controller.param
   }
   
-  MongoClient.connect('mongodb://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, {
+  MongoClient.connect('mongodb+srv://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
     }, function(err, client) {
@@ -148,6 +148,7 @@ function refreshController(controller) {
     
     client.close();
   });
+  // @todo: livetemp should send record instead of controller
   io.emit('liveTemp', controller);
 }
 
