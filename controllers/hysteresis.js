@@ -7,13 +7,19 @@ class Hysteresis {
     this.id = id;
     this.name = name;
     this.enabled = enabled;
-    this.type = "Hysteresis";
+    this.model = "Hysteresis";
 
     this.sensor = sensor;
     this.output = output;
-    this.updateRate = updateRate;  // minimum update period in milliseconds
+    this.updateRate = parseInt(updateRate);  // minimum update period in milliseconds
 
-    this.param = param;
+    this.param = {};
+
+    this.param.setpoint = parseFloat(param.setpoint);
+    this.param.onDeadband = parseFloat(param.onDeadband);
+    this.param.offDeadband = parseFloat(param.offDeadband);
+    this.param.minOffTime = parseInt(param.minOffTime);
+    this.param.minOnTime = parseInt(param.minOnTime);
     // ideas: alarm high, alarm low
 
     this.interval = {};

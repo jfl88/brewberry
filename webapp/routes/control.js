@@ -9,7 +9,8 @@ var config = require('../../config.json');
 var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectId;
 var assert = require('assert');
-var url = 'mongodb+srv://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr;
+var url = config.db_addr;
+var Controller = require('../../controllers/controller');
 
 var auth = function (req, res, next) {
   function unauthorized(res) {
@@ -179,8 +180,18 @@ router.get('/ctrlr/:id?', auth, function(req, res, next) {
 // @todo add controller property validation
 /* POST controller page */
 router.post('/ctrlr/:id?', auth, function(req, res, next) {
-  controller = req.body;
-  controller.enabled === "on" ? controller.enabled = true : controller.enabled = false;
+  controller = Controller.newController(
+    {
+      id: req.body.id,
+      name: req.body.name,
+      model: req.body.model,
+      enabled: req.body.enabled === 'on' ? true : false,
+      sensor: req.body.sensor,
+      output: req.body.output,
+      updateRate: req.body.updateRate,
+      param: req.body.param
+    }
+  );
 
   if (!req.params.id || !ObjectId.isValid(req.params.id))
     MongoClient.connect(url, {
