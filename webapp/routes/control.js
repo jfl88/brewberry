@@ -194,7 +194,7 @@ router.post('/ctrlr/:id?', auth, function(req, res, next) {
   try {
     controller = Controller.newController(submittedController);
   } catch (e) {
-    logger.debug('control.js: ' + e);
+    logger.info('control.js: ' + JSON.stringify(e));
     res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: submittedController, flashMsg: e });
     return;
   }
