@@ -9,7 +9,7 @@ block content
         .col-sm-6
           .form-group.pull-right
             input.btn.btn-link(type='submit', value='Save')
-      if flashMsg.length > 0
+      if flashMsg && flashMsg.length > 0
         .row
           .col-sm-12.alert.alert-danger
             each msg in flashMsg
