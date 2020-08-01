@@ -89,13 +89,16 @@ const MongoClient = require('mongodb').MongoClient;
 
 function startControllers()
 {
-  MongoClient.connect('mongodb+srv://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, {
+  MongoClient.connect(config.db_addr, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
     }, function(err, client) {
-      if (err)
-          logger.error('app.js: Error connecting to mongodb: ' + JSON.stringify(err));
-      else
+      if (err) {
+        logger.error('app.js: Error connecting to mongodb: ' + JSON.stringify(err));
+        setTimeout(function () { 
+          emitter.emit('controllerReload'); 
+        }, 60000);
+      } else
         client.db().collection('controllers').find()
         .toArray(function(err, docs) {
           assert.equal(err, null);
@@ -130,7 +133,7 @@ function refreshController(controller) {
     "param": controller.param
   }
   
-  MongoClient.connect('mongodb+srv://' + config.db_user + ':' + config.db_pw + '@' + config.db_addr, {
+  MongoClient.connect(config.db_addr, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
     }, function(err, client) {
@@ -155,11 +158,12 @@ function refreshController(controller) {
 function stopControllers() {
   if (!config.client_only) {
     logger.info('app.js: shutting down controllers');
-    controllers.forEach(function(controller) {
-      if (controller.runningState)
-        if (controller.stopControl())
-          logger.error('app.js: failed to stop controller: ' + controller.name);
-        delete controller;
+    if (controllers.length > 0)
+      controllers.forEach(function(controller) {
+        if (controller.runningState)
+          if (controller.stopControl())
+            logger.error('app.js: failed to stop controller: ' + controller.name);
+          delete controller;
     });
     controllers = [];
   }
