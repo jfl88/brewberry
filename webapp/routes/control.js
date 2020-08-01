@@ -180,19 +180,25 @@ router.get('/ctrlr/:id?', auth, function(req, res, next) {
 // @todo add controller property validation
 /* POST controller page */
 router.post('/ctrlr/:id?', auth, function(req, res, next) {
-  controller = Controller.newController(
-    {
-      id: req.body.id,
-      name: req.body.name,
-      model: req.body.model,
-      enabled: req.body.enabled === 'on' ? true : false,
-      sensor: req.body.sensor,
-      output: req.body.output,
-      updateRate: req.body.updateRate,
-      param: req.body.param
-    }
-  );
+  var submittedController = {
+    id: req.body.id,
+    name: req.body.name,
+    model: req.body.model,
+    enabled: req.body.enabled === 'on' ? true : false,
+    sensor: req.body.sensor,
+    output: req.body.output,
+    updateRate: req.body.updateRate,
+    param: req.body.param
+  }
 
+  try {
+    controller = Controller.newController(submittedController);
+  } catch (e) {
+    logger.debug('control.js: ' + e);
+    res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: submittedController, flashMsg: e });
+    return;
+  }
+  
   if (!req.params.id || !ObjectId.isValid(req.params.id))
     MongoClient.connect(url, {
       useUnifiedTopology: true,

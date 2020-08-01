@@ -7,15 +7,22 @@ class ReadOnly {
     this.id = id;
     this.name = name;
     this.enabled = enabled;
-    this.type = "Sensor Only";
+    this.model = "ReadOnly";
 
     this.sensor = sensor;
-    this.output = output;
-    this.updateRate = updateRate;  // minimum update period in milliseconds
+    this.output = "";
 
-    this.param = param;
-    //(for nocontrol: nothing)
-    // ideas: alarm high, alarm low
+    var validationErrors = [];
+    if (isNaN(updateRate))
+      validationErrors.push(this.constructor.name + ' controller validation failure: updateRate must be an integer!');
+
+    if (validationErrors.length > 0)
+      throw validationErrors;
+
+      this.updateRate = parseInt(updateRate);
+
+    this.param = param ? param : {};
+    // @todo ideas: alarm high, alarm low
 
     this.interval = {};
     this.runningState = 0;

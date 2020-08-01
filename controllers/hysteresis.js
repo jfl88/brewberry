@@ -2,7 +2,7 @@ const emitter = require('../emitter');
 const logger = require('../logger');
 
 class Hysteresis {
-  constructor(id, name, enabled,sensor, output, updateRate, param) {
+  constructor(id, name, enabled, sensor, output, updateRate, param) {
     // standard members
     this.id = id;
     this.name = name;
@@ -11,6 +11,18 @@ class Hysteresis {
 
     this.sensor = sensor;
     this.output = output;
+
+    var validationErrors = [];
+    if (isNaN(updateRate))
+      validationErrors.push(this.constructor.name + ' controller validation failure: updateRate must be an integer!');
+
+    for (const [ property, value ] of Object.entries(param))
+      if (isNaN(value))
+        validationErrors.push(this.constructor.name + ' controller validation failure: ' + property + ' must be a number!');
+
+    if (validationErrors.length > 0)
+      throw validationErrors;
+
     this.updateRate = parseInt(updateRate);  // minimum update period in milliseconds
 
     this.param = {};
@@ -20,7 +32,7 @@ class Hysteresis {
     this.param.offDeadband = parseFloat(param.offDeadband);
     this.param.minOffTime = parseInt(param.minOffTime);
     this.param.minOnTime = parseInt(param.minOnTime);
-    // ideas: alarm high, alarm low
+    // @todo ideas: alarm high, alarm low
 
     this.interval = {};
     this.runningState = 0;
