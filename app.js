@@ -142,12 +142,6 @@ function refreshController(controller) {
       if (err)
         logger.error('app.js: Error writing to collection: ' + err.message)
     });
-
-    client.db().collection('brews')
-      .findOneAndUpdate({ "complete": false }, { $push: { logs: record }}, function(err, r){
-        if (err)
-          logger.error('app.js: Error writing to collection: ' + err.message)
-    });
     
     client.close();
   });
