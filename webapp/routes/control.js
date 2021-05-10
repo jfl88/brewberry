@@ -90,7 +90,7 @@ router.get('/brew', auth, function(req, res, next) {
     recipeUrl : '',
     tempData : [],
     complete : false,
-    startDT : '',
+    startDT : new Date(), // setup brew with current datetime
     finishDT : ''
   }
   res.render('editbrew', { app_name: config.app_name, title: 'Create Brew', brew: newBrew });
