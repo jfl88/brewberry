@@ -22,7 +22,7 @@ block content
                 a(href=brew.recipeUrl) #{brew.name}
               p
                 label Stage:&nbsp
-                | Fermentation (started #{brew.startDT})
+                | Fermentation (started #{moment(brew.startDT).tz('America/Vancouver').format('DD MMM YYYY h:mm:ss a')})
               div(id=brew._id)
     .row
       .col-sm-12
