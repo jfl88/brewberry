@@ -90,7 +90,7 @@ router.get('/brew', auth, function(req, res, next) {
     recipeUrl : '',
     tempData : [],
     complete : false,
-    startDT : '',
+    startDT : new Date(), // setup brew with current datetime
     finishDT : ''
   }
   res.render('editbrew', { app_name: config.app_name, title: 'Create Brew', brew: newBrew });
@@ -223,6 +223,8 @@ router.post('/ctrlr/:id?', auth, function(req, res, next) {
       .replaceOne({ "_id": ObjectId(req.params.id)}, controller, { returnOriginal: false }, function(err, r){
         assert.equal(null, err);
         
+        controller._id = req.params.id;
+
         logger.info('control.js: Updated controller: ' + controller.name + ', reloading controllers.');
         emitter.emit('controllerReload');
         res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: controller });
