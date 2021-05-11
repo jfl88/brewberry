@@ -223,6 +223,8 @@ router.post('/ctrlr/:id?', auth, function(req, res, next) {
       .replaceOne({ "_id": ObjectId(req.params.id)}, controller, { returnOriginal: false }, function(err, r){
         assert.equal(null, err);
         
+        controller._id = req.params.id;
+
         logger.info('control.js: Updated controller: ' + controller.name + ', reloading controllers.');
         emitter.emit('controllerReload');
         res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: controller });
