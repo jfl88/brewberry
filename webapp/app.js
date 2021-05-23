@@ -14,7 +14,7 @@ var api = require('./routes/api');
 const logger = require('../logger');
 
 var app = express();
-app.locals.moment = require('moment-timezone');
+app.locals.moment = require('moment-timezone');  // @todo replace with luxon at some point
 app.locals.app_ver = require('../package').version;
 // @todo add local for app_name
 

@@ -48,7 +48,7 @@
                             pointRadius: 0,
                             backgroundColor: window.dataColours[idx % window.dataColours.length],
                             borderColor: window.dataColours[idx % window.dataColours.length],
-                            yAxisID: 'temp',
+                            yAxisID: 'y',
                             data: []
                         }
 
@@ -58,7 +58,7 @@
                             pointRadius: 0,
                             backgroundColor: window.outputColours[idx % window.outputColours.length],
                             borderColor: window.outputColours[idx % window.outputColours.length],
-                            yAxisID: 'onoff',
+                            yAxisID: 'y1',
                             steppedLine: true,
                             data: []
                         }
@@ -69,25 +69,25 @@
                             pointRadius: 0,
                             backgroundColor: window.setpointColours[idx % window.setpointColours.length],
                             borderColor: window.setpointColours[idx % window.setpointColours.length],
-                            yAxisID: 'temp',
+                            yAxisID: 'y',
                             data: []
                         }
 
                         controller.logs.forEach(function (log, idx, ary) {
                             dataset.data.push({
-                                x: new Date(log.timestamp),
+                                x: luxon.DateTime.fromISO(log.timestamp),
                                 y: log.sensorValue
                             })
 
                             if (controller.output)
                                 outputset.data.push({
-                                    x: new Date(log.timestamp),
+                                    x: luxon.DateTime.fromISO(log.timestamp),
                                     y: log.outputValue
                                 })
 
                             if (controller.param.setpoint !== undefined)
                                 setpoint.data.push({
-                                    x: new Date(log.timestamp),
+                                    x: luxon.DateTime.fromISO(log.timestamp),
                                     y: log.param.setpoint
                             })
 
@@ -120,26 +120,31 @@
                                 mode: 'label'
                             },
                             scales: {
-                                xAxes: [{
-                                    type: 'time'
-                                }],
-                                yAxes: [
-                                {
-                                    id: 'temp',
-                                    scaleLabel: {
+                                x: {
+                                    type: 'time',
+                                    title: {
                                         display: true,
-                                        labelString: 'Temperature'
+                                        text: 'Time'
                                     }
                                 },
+                                y:
+                                {
+                                    id: 'temp',
+                                    title: {
+                                        display: true,
+                                        text: 'Temperature'
+                                    }
+                                },
+                                y1:
                                 {
                                     id: 'onoff',
-                                    scaleLabel: {
+                                    title: {
                                         display: true,
-                                        labelString: 'State'
+                                        text: 'State'
                                     },
                                     position: 'right',
+                                    min: 0,
                                     ticks: {
-                                        beginAtZero: true,
                                         callback: function(value, index, values) {
                                             if (value % 1 === 0)
                                                 if (value === 0)
@@ -148,7 +153,7 @@
                                                     return 'ON';
                                         }
                                     }
-                                }]
+                                }
                             }
                         }
 
@@ -170,10 +175,10 @@
                                     return element.label === (data.name + " " + data.sensor.name);
                                 });
 
-                                $scope.brewData.datasets[chartIndex].data.push({ x: new Date(data.sensor.currentRecord.timestamp), y: data.sensor.currentRecord.temp })
+                                $scope.brewData.datasets[chartIndex].data.push({ x: luxon.DateTime.fromISO(data.sensor.currentRecord.timestamp), y: data.sensor.currentRecord.temp })
 
                                 if (data.output)
-                                    $scope.brewData.datasets[chartIndex + 1].data.push({ x: new Date(), y: data.output.state })
+                                    $scope.brewData.datasets[chartIndex + 1].data.push({ x: luxon.DateTime.now(), y: data.output.state })
 
                                 brewGraph.update();
 
