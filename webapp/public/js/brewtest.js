@@ -119,7 +119,8 @@
                                 zoom: {
                                     pan: {
                                         enabled: true,
-                                        mode: 'xy'
+                                        mode: 'xy',
+                                        overScaleMode: 'y'
                                     }, 
                                     zoom: {
                                         wheel: {
@@ -128,7 +129,8 @@
                                         pinch: {
                                             enabled: true
                                         }, 
-                                        mode: 'xy'
+                                        mode: 'xy',
+                                        overScaleMode: 'y'
                                     }
                                 }
                             },
