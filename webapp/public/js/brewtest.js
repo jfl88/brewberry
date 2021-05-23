@@ -115,6 +115,23 @@
                         type: 'line',
                         data: $scope.brewData,
                         options: {
+                            plugins: {
+                                zoom: {
+                                    pan: {
+                                        enabled: true,
+                                        mode: 'xy'
+                                    }, 
+                                    zoom: {
+                                        wheel: {
+                                            enabled: true
+                                        }, 
+                                        pinch: {
+                                            enabled: true
+                                        }, 
+                                        mode: 'xy'
+                                    }
+                                }
+                            },
                             tooltips: {
                                 // display all datapoints on tooltip
                                 mode: 'label'
