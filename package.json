@@ -14,6 +14,7 @@
     "body-parser": "^1.18.3",
     "chart.js": "^3.2.1",
     "chartjs-adapter-luxon": "^1.0.0",
+    "chartjs-plugin-zoom": "^1.0.0-rc",
     "cookie-parser": "^1.4.3",
     "debug": "^3.1.0",
     "ds18b20": "^0.1.0",
