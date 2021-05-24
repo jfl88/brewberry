@@ -218,79 +218,147 @@
         .module('brewtest')
         .controller('historyCtrl', ['$scope', '$http',
         function ($scope, $http) {
-            var layout = {
-                showlegend: false,
-                xaxis: { title: 'Date / Time', type: 'date' },
-                yaxis: { title: 'Temperature (°C)', nticks: 10 },
-                yaxis2: {
-                    title: 'Output Status',
-                    nticks: 2,
-                    range: [ 0, 1 ],
-                    overlaying: 'y',
-                    side: 'right'
-                },
-                margin: {
-                    l: 50,
-                    r: 50,
-                    b: 50,
-                    t: 50,
-                    pad: 4
-                }
-            };
+            var brewGraph = [];
 
-            $http.get('/api/brews/').then(function success(resp) {
-                console.log(resp.data);
-                $scope.brews = resp.data;
-                $scope.brews.forEach(function (brew) {
-                    var datasets = [];
-
-
-
+            $scope.$watch('brews', function () {
+                $scope.brews.forEach(function(brew){
+                    $http.get('/api/getlogs/' + new Date(brew.startDT).getTime().toString() + '/' + (brew.complete ? new Date(brew.finishDT).getTime().toString() : new Date().getTime().toString())).then(function success(resp) {
+                        var controllers = resp.data
                     
-                });
-                var chartConfig = {
-                    type: 'line',
-                    data: [],
-                    options: {
-                        tooltips: {
-                            // display all datapoints on tooltip
-                            mode: 'label'
-                        },
-                        scales: {
-                            xAxes: [{
-                                type: 'time'
-                            }],
-                            yAxes: [
-                            {
-                                id: 'temp',
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: 'Temperature'
-                                }
-                            },
-                            {
-                                id: 'onoff',
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: 'State'
+                        var graphData = {
+                            datasets: [],
+                        }
+
+                        controllers.forEach(function(controller, idx, ary) {
+                            var dataset = {
+                                label: controller.name + " " + controller.sensor.name,
+                                fill: false,
+                                pointRadius: 0,
+                                backgroundColor: window.dataColours[idx % window.dataColours.length],
+                                borderColor: window.dataColours[idx % window.dataColours.length],
+                                yAxisID: 'y',
+                                data: []
+                            }
+
+                            var outputset = {
+                                label: controller.name + " " + controller.output.name,
+                                fill: false,
+                                pointRadius: 0,
+                                backgroundColor: window.outputColours[idx % window.outputColours.length],
+                                borderColor: window.outputColours[idx % window.outputColours.length],
+                                yAxisID: 'y1',
+                                steppedLine: true,
+                                data: []
+                            }
+
+                            var setpoint = {
+                                label: controller.name + " Setpoint",
+                                fill: false,
+                                pointRadius: 0,
+                                backgroundColor: window.setpointColours[idx % window.setpointColours.length],
+                                borderColor: window.setpointColours[idx % window.setpointColours.length],
+                                yAxisID: 'y',
+                                data: []
+                            }
+
+                            controller.logs.forEach(function (log, idx, ary) {
+                                dataset.data.push({
+                                    x: luxon.DateTime.fromISO(log.timestamp),
+                                    y: log.sensorValue
+                                })
+
+                                if (controller.output)
+                                    outputset.data.push({
+                                        x: luxon.DateTime.fromISO(log.timestamp),
+                                        y: log.outputValue
+                                    })
+
+                                if (controller.param.setpoint !== undefined)
+                                    setpoint.data.push({
+                                        x: luxon.DateTime.fromISO(log.timestamp),
+                                        y: log.param.setpoint
+                                })
+                            });
+                            
+                            graphData.datasets.push(dataset);
+                            if (outputset.data.length > 0)
+                                graphData.datasets.push(outputset);
+                            
+                            if (setpoint.data.length > 0)
+                                graphData.datasets.push(setpoint);
+                        });
+
+                        var chartConfig = {
+                            type: 'line',
+                            data: graphData,
+                            options: {
+                                plugins: {
+                                    zoom: {
+                                        pan: {
+                                            enabled: true,
+                                            mode: 'xy',
+                                            overScaleMode: 'y'
+                                        }, 
+                                        zoom: {
+                                            wheel: {
+                                                enabled: true
+                                            }, 
+                                            pinch: {
+                                                enabled: true
+                                            }, 
+                                            mode: 'xy',
+                                            overScaleMode: 'y'
+                                        }
+                                    }
                                 },
-                                position: 'right',
-                                ticks: {
-                                    beginAtZero: true,
-                                    callback: function(value, index, values) {
-                                        if (value % 1 === 0)
-                                            if (value === 0)
-                                                return 'OFF';
-                                            else
-                                                return 'ON';
+                                tooltips: {
+                                    // display all datapoints on tooltip
+                                    mode: 'label'
+                                },
+                                scales: {
+                                    x: {
+                                        type: 'time',
+                                        title: {
+                                            display: true,
+                                            text: 'Time'
+                                        }
+                                    },
+                                    y:
+                                    {
+                                        id: 'temp',
+                                        title: {
+                                            display: true,
+                                            text: 'Temperature'
+                                        }
+                                    },
+                                    y1:
+                                    {
+                                        id: 'onoff',
+                                        title: {
+                                            display: true,
+                                            text: 'State'
+                                        },
+                                        position: 'right',
+                                        min: 0,
+                                        ticks: {
+                                            callback: function(value, index, values) {
+                                                if (value % 1 === 0)
+                                                    if (value === 0)
+                                                        return 'OFF';
+                                                    else
+                                                        return 'ON';
+                                            }
+                                        }
                                     }
                                 }
-                            }]
-                        }
-                    }
-                }
-            });
+                            }
 
+                        }
+
+                        brewGraph.push(new Chart(document.getElementById(brew._id).getContext('2d'), chartConfig));
+                    });
+                });
+            });
         }
     ]);
 })();

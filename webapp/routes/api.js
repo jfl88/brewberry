@@ -26,36 +26,36 @@ router.route('/currentbrew')
 
 router.route('/getlogs/:from/:to')
   .get(function(req, res, next) {
-    from = new Date(+req.params.from);
-    to = new Date(+req.params.to);
+    var from = new Date(+req.params.from);
+    var to = new Date(+req.params.to);
     var results = [];
-      MongoClient.connect(url, {
-        useUnifiedTopology: true,
-        useNewUrlParser: true,
-      }, function(err, client){
-        client.db().collection('controllerLog')
-        .find({
-          timestamp: {
-            $gte: from,
-            $lte: to
-          }
-        })
-        .sort({ timestamp: 1 })
-        .toArray(function(err, docs) {
-          assert.equal(err, null);
-          config.controllers.forEach(function (controller, idx, ary) {
-            controller.logs = [];
-            docs.forEach(function(log) {
-              if (log.id === controller.id)
-                controller.logs.push(log);
-            });
+    MongoClient.connect(url, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    }, function(err, client){
+      client.db().collection('controllerLog')
+      .find({
+        timestamp: {
+          $gte: from,
+          $lte: to
+        }
+      })
+      .sort({ timestamp: 1 })
+      .toArray(function(err, docs) {
+        assert.equal(err, null);
+        config.controllers.forEach(function (controller, idx, ary) {
+          controller.logs = [];
+          docs.forEach(function(log) {
+            if (log.id === controller.id)
+              controller.logs.push(log);
+          });
           results.push(controller);
 
           // finished grabbing controller logs, send response
-          if (idx === ary.length - 1)
+          if (idx === ary.length - 1) {
             res.json(results);
-          
-          client.close();
+            client.close();
+          }
         });      
       });
     });

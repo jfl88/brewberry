@@ -1,29 +1,28 @@
 extends layout
 
 block content
-  div(ng-controller='historyCtrl', class='container')
+  div(ng-controller='historyCtrl', ng-init='brews= #{JSON.stringify(brews)}', class='container')
     .row
       .col-md-12
         h4=title
           span.pull-right
             a(href='/control/brew/') New Brew
         hr
-    for brew in brews    
-      .row(name=brew._id)
+      .row(ng-repeat='brew in brews')
         .col-sm-12
           .panel.panel-default
             .panel-heading
-              label #{brew.name}
+              label {{brew.name}}
               span.pull-right
-                a(href='/control/brew/' + brew._id) Edit Brew
+                a(href='/control/brew/{{brew._id}}') Edit Brew
             .panel-body
               p
                 label Recipe:&nbsp
-                a(href=brew.recipeUrl) #{brew.name}
+                a(href='{{brew.recipeUrl}}') {{brew.name}}
               p
                 label Stage:&nbsp
-                | Fermentation (started #{moment(brew.startDT).tz('America/Vancouver').format('DD MMM YYYY h:mm:ss a')})
-              div(id=brew._id)
+                | Fermentation (started {{brew.startDT}})
+              canvas(id='{{brew._id}}')
     .row
       .col-sm-12
         .panel.panel-default
