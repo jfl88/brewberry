@@ -224,7 +224,6 @@
                 $scope.brews.forEach(function(brew){
                     $http.get('/api/getlogs/' + new Date(brew.startDT).getTime().toString() + '/' + (brew.complete ? new Date(brew.finishDT).getTime().toString() : new Date().getTime().toString())).then(function success(resp) {
                         var controllers = resp.data
-                    
                         var graphData = {
                             datasets: [],
                         }
@@ -354,7 +353,7 @@
                             }
 
                         }
-
+                        
                         brewGraph.push(new Chart(document.getElementById(brew._id).getContext('2d'), chartConfig));
                     });
                 });
