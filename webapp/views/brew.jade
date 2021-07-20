@@ -14,7 +14,10 @@ block content
       .col-sm-12
         .panel.panel-default
           .panel-heading
-            label Edit Brew
+            if brew._id 
+              label Edit Brew 
+            else 
+              label Create Brew
           .panel-body
             form.form-horizontal(action='/control/brew/' + (brew._id ? brew._id : ''), method='post')
               .form-group
@@ -50,30 +53,43 @@ block content
                     input.form-control(type='submit', value='Edit Brew')
                   else
                     input.form-control(type='submit', value='Create Brew')
+    .row 
+      .col-sm-6 
+        .panel.panel-default 
+          .panel-heading 
+            label Brew Steps
+          .panel-body
+            if !brew.steps
+              p This brew has no steps! 
+      .col-sm-6
+        .panel.panel-default 
+          .panel-heading
+            label Add Step
           .panel-body
             form.form-horizontal
               .form-group
-                  label.control-label.col-sm-2 Timestamp:
-                  .col-sm-10
-                    p.form-control 2018-09-24T08:00:00-08:00
+                label.control-label.col-sm-4 Step Name:
+                .col-sm-8
+                  input.form-control(type='text', name='name')
               .form-group
-                label.control-label.col-sm-2 Step:
-                .col-sm-10
-                  select.form-control(name='step', value='')
-                    option Mash Complete
-                    option Boil Complete
-                    option Added to Fermenter
-                    option Sample
-                    option Fermentation Complete
+                label.control-label.col-sm-4 Start:
+                .col-sm-8
+                  p.form-control 2018-09-24T08:00:00-08:00
               .form-group
-                label.control-label.col-sm-2 SG Reading:
-                .col-sm-10
-                  input.form-control(type='text', name='sg')
+                label.control-label.col-sm-4 Duration:
+                .col-sm-8
+                  input.form-control(type='text', name='name')
               .form-group
-                label.control-label.col-sm-2 Volume:
-                .col-sm-10
-                  input.form-control(type='text', name='vol')
+                label.control-label.col-sm-4 Controller:
+                .col-sm-8
+                  select.form-control(name='controllerID', value='')
+                    option blah
+                    option blahBlah
               .form-group
-                label.control-label.col-sm-2 Notes:
-                .col-sm-10
-                  textarea(cols=30, rows=5)
+                label.control-label.col-sm-4 Temperature:
+                .col-sm-8
+                  input.form-control(type='text', name='setpoint')
+              .form-group
+                label.control-label.col-sm-4 Notes:
+                .col-sm-8
+                  textarea(name='notes', cols=100 , rows=5, style="max-width:100%;")
