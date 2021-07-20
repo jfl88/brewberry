@@ -42,54 +42,52 @@ block content
                 .col-sm-10
                   input.form-control(type='checkbox', name='complete', checked=brew.complete)
               .form-group
-                label.control-label.col-sm-2 Temperature Data:
-                .col-sm-10
-                  // @todo fix this when I figure out how temp data is going to be logged to brews
-                  if brew.tempData
-                    p.form-control #{brew.tempData.length} record(s).
-              .form-group
                 .col-sm-offset-2.col-sm-10
                   if brew._id
                     input.form-control(type='submit', value='Edit Brew')
                   else
                     input.form-control(type='submit', value='Create Brew')
-    .row 
-      .col-sm-6 
-        .panel.panel-default 
-          .panel-heading 
-            label Brew Steps
-          .panel-body
-            if !brew.steps
-              p This brew has no steps! 
-      .col-sm-6
-        .panel.panel-default 
-          .panel-heading
-            label Add Step
-          .panel-body
-            form.form-horizontal
-              .form-group
-                label.control-label.col-sm-4 Step Name:
-                .col-sm-8
-                  input.form-control(type='text', name='name')
-              .form-group
-                label.control-label.col-sm-4 Start:
-                .col-sm-8
-                  p.form-control 2018-09-24T08:00:00-08:00
-              .form-group
-                label.control-label.col-sm-4 Duration:
-                .col-sm-8
-                  input.form-control(type='text', name='name')
-              .form-group
-                label.control-label.col-sm-4 Controller:
-                .col-sm-8
-                  select.form-control(name='controllerID', value='')
-                    option blah
-                    option blahBlah
-              .form-group
-                label.control-label.col-sm-4 Temperature:
-                .col-sm-8
-                  input.form-control(type='text', name='setpoint')
-              .form-group
-                label.control-label.col-sm-4 Notes:
-                .col-sm-8
-                  textarea(name='notes', cols=100 , rows=5, style="max-width:100%;")
+    if brew._id 
+      .row 
+        .col-sm-6 
+          .panel.panel-default 
+            .panel-heading 
+              label Brew Steps
+            .panel-body
+              if !brew.steps
+                p This brew has no steps! 
+        .col-sm-6
+          .panel.panel-default 
+            .panel-heading
+              label Add Step
+            .panel-body
+              form.form-horizontal(action='/control/brew/addstep' + (brew._id ? brew._id : ''), method='post')
+                .form-group
+                  label.control-label.col-sm-4 Step Name:
+                  .col-sm-8
+                    input.form-control(type='text', name='name')
+                .form-group
+                  label.control-label.col-sm-4 Start:
+                  .col-sm-8
+                    p.form-control 2018-09-24T08:00:00-08:00
+                .form-group
+                  label.control-label.col-sm-4 Duration:
+                  .col-sm-8
+                    input.form-control(type='text', name='name')
+                .form-group
+                  label.control-label.col-sm-4 Controller:
+                  .col-sm-8
+                    select.form-control(name='controllerID', value='')
+                      option blah
+                      option blahBlah
+                .form-group
+                  label.control-label.col-sm-4 Temperature:
+                  .col-sm-8
+                    input.form-control(type='text', name='setpoint')
+                .form-group
+                  label.control-label.col-sm-4 Notes:
+                  .col-sm-8
+                    textarea(name='notes', cols=100 , rows=5, style="max-width:100%;")
+                .form-group
+                .col-sm-offset-4.col-sm-8
+                  input.form-control(type='submit', value='Add Step')
