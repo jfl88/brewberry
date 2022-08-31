@@ -25,7 +25,7 @@
     "joi": "^13.3.0",
     "luxon": "^1.27.0",
     "moment": "^2.27.0",
-    "moment-timezone": "^0.5.31",
+    "moment-timezone": "^0.5.35",
     "mongodb": "^3.4.1",
     "morgan": "^1.9.0",
     "serve-favicon": "^2.5.0",
