@@ -1,6 +1,6 @@
 {
   "name": "brewberry",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "Records temperature to a MongoDB and runs a websocket server for live temperature.",
   "main": "app.js",
   "scripts": {
@@ -24,7 +24,7 @@
     "jade": "^1.11.0",
     "joi": "^13.3.0",
     "luxon": "^1.27.0",
-    "moment": "^2.27.0",
+    "moment": "^2.29.4",
     "moment-timezone": "^0.5.35",
     "mongodb": "^3.4.1",
     "morgan": "^1.9.0",
