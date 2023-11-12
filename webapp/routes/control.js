@@ -77,7 +77,7 @@ router.get('/brew/:brewid', auth, function(req, res, next) {
     client.db().collection('brews')
     .findOne({ "_id": ObjectId(req.params.brewid)}, function(err, doc) {
       assert.equal(err, null);
-      res.render('editbrew', { app_name: config.app_name, title: 'Edit Brew', brew: doc });
+      res.render('brew', { app_name: config.app_name, title: 'Edit Brew', brew: doc });
       client.close();
     });      
   });
@@ -93,7 +93,7 @@ router.get('/brew', auth, function(req, res, next) {
     startDT : new Date(), // setup brew with current datetime
     finishDT : ''
   }
-  res.render('editbrew', { app_name: config.app_name, title: 'Create Brew', brew: newBrew });
+  res.render('brew', { app_name: config.app_name, title: 'Create Brew', brew: newBrew });
 });
 
 /* BREW - EDIT EXISTING */
@@ -115,7 +115,7 @@ router.post('/brew/:brewid', auth, function(req, res, next) {
     .findOneAndUpdate({ "_id": ObjectId(req.params.brewid)}, brewUpdate, { returnOriginal: false }, function(err, r){
       assert.equal(null, err);
 
-      res.render('editbrew', { app_name: config.app_name, title: 'Brewing Control Centre', brew: r.value, update: true });
+      res.render('brew', { app_name: config.app_name, title: 'Brewing Control Centre', brew: r.value, update: true });
       client.close();
     });
   });
@@ -139,7 +139,7 @@ router.post('/brew/', auth, function(req, res, next) {
     .insertOne(newBrew, function(err, r){
       assert.equal(null, err);
 
-      res.render('editbrew', { app_name: config.app_name, title: 'Brewing Control Centre', brew: newBrew._id, update: true });
+      res.render('brew', { app_name: config.app_name, title: 'Brewing Control Centre', brew: newBrew._id, update: true });
       client.close();
     });
   });
