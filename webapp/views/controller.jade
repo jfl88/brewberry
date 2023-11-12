@@ -7,7 +7,7 @@ block content
         .col-sm-6
           h4=title
         .col-sm-6
-          .form-group.pull-right
+          .float-end
             input.btn.btn-link(type='submit', value='Save')
       if flashMsg && flashMsg.length > 0
         .row
@@ -16,73 +16,70 @@ block content
               p #{msg}
       .row
         .col-sm-4.col-md-4
-          .panel.panel-default
-            .panel-heading
-              label Controller
-            .panel-body
-              .form-group
-                label.control-label.col-sm-4 ID:
+          .card
+            .card-header Controller
+            .card-body
+              .row.mb-2
+                label.col-sm-4.col-form-label(for='id') ID:
                 .col-sm-8
                   input.form-control(type='text', name='id', value=controller.id readonly)
-              .form-group
-                label.control-label.col-sm-4 Name:
+              .row.mb-3
+                label.col-sm-4.col-form-label(for='name') Name:
                 .col-sm-8
                   input.form-control(type='text', name='name', value=controller.name)
-              .form-group
-                label.control-label.col-sm-4 Enabled: 
+              .row.mb-3
+                label.col-sm-4.form-check-label(for='enabled') Enabled: 
                 label.col-sm-8
-                  input.form-control(type='checkbox', name='enabled', checked=controller.enabled)
-              .form-group
-                label.control-label.col-sm-4 Model:
+                  input.form-check-input(type='checkbox', name='enabled', checked=controller.enabled)
+              .row.mb-2
+                label.col-sm-4.col-form-label(for='model') Model:
                 .col-sm-8
                   select.form-control(name='model')
                     option #{controller.model}
-              .form-group
-                label.control-label.col-sm-4 Update Rate:
+              .row.mb-2
+                label.col-sm-4.col-form-label(for='updateRate') Update Rate:
                 .col-sm-8
                   input.form-control(type='text', name='updateRate', value=controller.updateRate)
             if Object.keys(controller.param).length > 0
-              .panel-heading
+              .card-header
                 label Parameters:
-              .panel-body
+              .card-body
                 each item, name in controller.param
-                  .form-group
-                    label.control-label.col-sm-6 #{name}:
+                  .row.mb-2
+                    label.col-sm-6.col-form-label(for='param[#{name}]') #{name}:
                     .col-sm-6
                       input.form-control(type='text', name='param[#{name}]', value=item)
         .col-sm-4.col-md-4
-          .panel.panel-default
-            .panel-heading
-              label Sensor
-            .panel-body
-              .form-group
-                label.control-label.col-sm-4 Model:
+          .card
+            .card-header Sensor
+            .card-body
+              .row.mb-2
+                label.col-sm-4.col-form-label(for='sensor[model]') Model:
                 .col-sm-8
                   select.form-control(name='sensor[model]')
                     option #{controller.sensor.model}
-              .form-group
-                label.control-label.col-sm-4 Identifier:
+              .row.mb-2
+                label.col-sm-4.col-form-label(for='sensor[id]') Identifier:
                 .col-sm-8
                   input.form-control(type='text', name='sensor[id]', value=controller.sensor.id)
-              .form-group
-                label.control-label.col-sm-4 Name:
+              .row.mb-2
+                label.col-sm-4.col-form-label(for='sensor[name]') Name:
                 .col-sm-8
                   input.form-control(type='text', name='sensor[name]', value=controller.sensor.name)
         .col-sm-4.col-md-4
-            .panel.panel-default
-              .panel-heading
-                label Output
-              .panel-body
-                .form-group
-                  label.control-label.col-sm-4 Model:
+            .card
+              .card-header Output
+              .card-body
+                .row.mb-2
+                  label.col-sm-4.col-form-label(for='output[model]') Model:
                   .col-sm-8
                     select.form-control(name='output[model]')
                       option #{controller.output.model}
-                .form-group
-                  label.control-label.col-sm-4 Identifier:
+                .row.mb-2
+                  label.col-sm-4.col-form-label(for='output[id]') Identifier:
                   .col-sm-8
                     input.form-control(type='text', name='output[id]', value=controller.output.id)
-                .form-group
-                  label.control-label.col-sm-4 Name:
+                .row.mb-2
+                  label.col-sm-4.col-form-label(for='output[name]') Name:
                   .col-sm-8
                     input.form-control(type='text', name='output[name]', value=controller.output.name)

@@ -2,16 +2,15 @@ extends layout
 
 block content
   div
-    .row
-      .col-md-12
+    .row.row-cols-1
+      .col
         h4=title
         hr
-    .row
-      .col-md-12
-        .panel.panel-default
-          .panel-heading
-            label Log Viewer
-          .panel-body
+    .row.row-cols-1
+      .col
+        .card
+          h6.card-header Log Viewer
+          .card-body
             table.table
               tr
                 th Hostname
@@ -24,13 +23,13 @@ block content
                   td #{moment(log.timestamp).tz('America/Vancouver').format('DD MMM YYYY h:mm:ss a')}
                   td #{log.level}
                   td #{log.message}
-          .panel-footer
-            .row
-              .col-sm-4
+          .card-footer
+            .row.row-cols-3
+              .col
                 if page > 1
                   a(href='/control/logs/' + (parseInt(page) - 1)) Prev Page
-              .col-sm-4.text-center
+              .col.text-center
                 | Page #{page} of #{numPages}
-              .col-sm-4.text-right
+              .col.text-end
                 if page < numPages
                   a(href='/control/logs/' + (parseInt(page) + 1)) Next Page
