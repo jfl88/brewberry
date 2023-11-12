@@ -14,5 +14,5 @@
 # [START gae_quickstart_yaml]
 service: default
 env: standard
-runtime: nodejs12
+runtime: nodejs20
 # [END gae_quickstart_yaml]
