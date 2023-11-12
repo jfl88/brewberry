@@ -1,36 +1,33 @@
 extends layout
 
 block content
-  div(ng-controller='homeCtrl', class='container-fluid')
-    .row.equal
-      .col-sm-6.col-md-6
-        .panel.panel-default
-          .panel-heading
-            label Current Brew
-          .panel-body(ng-if="!currentBrew")
+  div(ng-controller='homeCtrl')
+    .row.row-cols-2.mb-4
+      .col
+        .card.h-100
+          h6.card-header Current Brew
+          .card-body(ng-if="!currentBrew")
             p
               h3 Nothing Brewing!
-          .panel-body(ng-if="currentBrew")
+          .card-body(ng-if="currentBrew")
             p
-              label Name:&nbsp
+              b Name:&nbsp
               a(href='{{ currentBrew.recipeUrl }}') {{ currentBrew.name }}
             p
-              label Started:&nbsp
+              b Started:&nbsp
               | {{ currentBrew.startDT | date }}
-      .col-sm-6.col-md-6
-        .panel.panel-default
-          .panel-heading
-            label Live Temp
-          .panel-body
+      .col
+        .card.h-100
+          h6.card-header Live Temp
+          .card-body
             p(ng-repeat="temp in liveTemp") 
-              label {{ temp.name }} {{ temp.sensor.name }}:&nbsp
+              b {{ temp.name }} {{ temp.sensor.name }}:&nbsp
               | {{ temp.sensor.currentRecord.temp + temp.sensor.units}} ({{ ((temp.sensor.currentRecord.temp * 9) / 5) + 32 | number:1 }}°F)&nbsp
-              label {{ temp.output ? temp.output.name + ':' : '' }}&nbsp
+              b {{ temp.output ? temp.output.name + ':' : '' }}&nbsp
               | {{ temp.output ? (temp.output.state === 1 ? 'ON' : 'OFF') : ''}}&nbsp
-    .row
-      .col-md-12
-        .panel.panel-default
-          .panel-heading
-            label Brew Temperature (Last 24 Hours)
-          .panel-body
+    .row.row-cols-1.mb-4
+      .col
+        .card
+          h6.card-header Brew Temperature (Last 24 Hours)
+          .card-body
             canvas(id='brewGraph')
