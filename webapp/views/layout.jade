@@ -1,12 +1,13 @@
 doctype html
-html
+html(lang='en')
   head
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
     title=app_name + ' - ' + title
 
-    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
+    link(rel='stylesheet', href='https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css', integrity='sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC', crossorigin='anonymous')
     link(rel='stylesheet', href='/css/site.css')    
-    script(type='text/javascript', src='https://code.jquery.com/jquery-1.12.4.min.js')
-    script(type='text/javascript', src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js')
+    script(type='text/javascript', src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js', integrity='sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM', crossorigin='anonymous')
     script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular.js')
     script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular-route.js')
     script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.4.0/socket.io.js')
@@ -17,44 +18,38 @@ html
     script(type='text/javascript', src='/js/chartjs-plugin-zoom.min.js')
     script(type='text/javascript', src='/js/brewtest.js')
   body(ng-app='brewtest')
-    nav.navbar.navbar-default
+    nav.navbar.navbar-expand-lg.navbar-light.bg-light.mb-4
       .container
-        .navbar-header
-          button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#navbar', aria-expanded='false', aria-controls='navbar')
-            span.sr-only Toggle navigation 
-            span.icon-bar 
-            span.icon-bar
-            span.icon-bar
-        #navbar.navbar-collapse.collapse
-          ul.nav.navbar-nav
-            li
-              a.navbar-brand(href='/') Bellthorpe Brewing
-            li
-              a(href='/') Current Brew
-            li
-              a(href='/history') Brew History
-            li
-              a(href='#contact') Contact
-          ul.nav.navbar-nav.navbar-right
-            li.dropdown
-              a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-expanded='false') Control
-                  span.caret
-              ul.dropdown-menu(role='menu')
+        a.navbar-brand(href='/') Bellthorpe Brewing
+        button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbarNavAltMarkup', aria-controls='navbarNavAltMarkup', aria-expanded='false', aria-label='Toggle navigation')
+          span.navbar-toggler-icon
+        .collapse.navbar-collapse(id='navbarNavAltMarkup')
+          ul.navbar-nav.me-auto
+            li.nav-item
+              a.nav-link(href='/') Current Brew
+            li.nav-item  
+              a.nav-link(href='/history') Brew History
+            li.nav-item
+              a.nav-link(href='#contact') Contact
+          ul.navbar-nav.justify-content-end
+            li.navbar-nav.nav-item.dropdown
+              a.nav-link.dropdown-toggle(href='#', id='navbarDropdownMenuLink', role='button', data-bs-toggle='dropdown', aria-expanded='false') Control
+              ul.dropdown-menu(aria-labelledby='navbarDropdownMenuLink')
                 li
-                  a(href='/control') Control
-                li
-                  a(href='/control/logs') Logs
+                  a.dropdown-item(href='/control') Control 
+                li 
+                  a.dropdown-item(href='/control/logs') Logs
     .container
       block content
     .container
       .footer
         hr
-        .col-md-6
-          p 
-            a(href='https://github.com/jfl88/brewberry') brewberry by JFL
-            | &nbsp v#{app_ver}
-        .col-md-6.text-right
-          | &copy; bellthorpe industries 2017
+        .d-flex.flex-row.justify-content-between
+          p
+            a(href='https://github.com/jfl88/brewberry') brewberry by JFL 
+            &nbsp v#{app_ver}
+          p
+            &copy; bellthorpe industries 2017
 
   script.
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

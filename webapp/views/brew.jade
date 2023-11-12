@@ -3,7 +3,7 @@ extends layout
 block content
   div
     .row
-      .col-md-12
+      .col
         h4=title
         hr
     if update    
@@ -11,83 +11,83 @@ block content
         .col-sm-12.alert.alert-success
           p Successfully updated #{brew.name}!
     .row
-      .col-sm-12
-        .panel.panel-default
-          .panel-heading
+      .col
+        .card.mb-4
+          .card-header
             if brew._id 
               label Edit Brew 
             else 
               label Create Brew
-          .panel-body
+          .card-body
             form.form-horizontal(action='/control/brew/' + (brew._id ? brew._id : ''), method='post')
-              .form-group
-                label.control-label.col-sm-2 Brew Name:
+              .row.mb-2
+                label.col-sm-2.col-form-label(for='name') Brew Name:
                 .col-sm-10
                   input.form-control(type='text', name='name', value=brew.name)
-              .form-group
-                label.control-label.col-sm-2 Recipe Url:
+              .row.mb-2
+                label.col-sm-2.col-form-label(for='recipeUrl') Recipe Url:
                 .col-sm-10  
                   input.form-control(type='text', name='recipeUrl', value=brew.recipeUrl)
               // @todo add datetimepickers for start and end timestamps
-              .form-group
-                label.control-label.col-sm-2 Brew Start:
+              .row.mb-2
+                label.col-sm-2.col-form-label(for='startDT') Brew Start:
                 .col-sm-10
                   input.form-control(type='text', name='startDT', value=brew.startDT)
-              .form-group
-                label.control-label.col-sm-2 Brew Finish:
+              .row.mb-3
+                label.col-sm-2.col-form-label(for='finishDT') Brew Finish:
                 .col-sm-10
                   input.form-control(type='text', name='finishDT', value=brew.finishDT)
-              .form-group
-                label.control-label.col-sm-2 Complete:
+              .row.mb-3
+                label.col-sm-2.form-check-label(for='complete') Complete:
                 .col-sm-10
-                  input.form-control(type='checkbox', name='complete', checked=brew.complete)
-              .form-group
-                .col-sm-offset-2.col-sm-10
+                  input.form-check-input(type='checkbox', name='complete', checked=brew.complete)
+              .row.mb-2
+                .col-sm-10.offset-sm-2
                   if brew._id
                     input.form-control(type='submit', value='Edit Brew')
                   else
                     input.form-control(type='submit', value='Create Brew')
     if brew._id 
-      .row 
-        .col-sm-6 
-          .panel.panel-default 
-            .panel-heading 
+      .row.row-cols-1.row-cols-md-2
+        .col
+          .card.mb-4
+            .card-header
               label Brew Steps
-            .panel-body
+            .card-body
               if !brew.steps
                 p This brew has no steps! 
-        .col-sm-6
-          .panel.panel-default 
-            .panel-heading
+        .col
+          .card.mb-2
+            .card-header
               label Add Step
-            .panel-body
+            .card-body
               form.form-horizontal(action='/control/brew/addstep' + (brew._id ? brew._id : ''), method='post')
-                .form-group
-                  label.control-label.col-sm-4 Step Name:
+                .row.mb-2
+                  label.col-sm-4.col-form-label(for='name') Step Name:
                   .col-sm-8
                     input.form-control(type='text', name='name')
-                .form-group
-                  label.control-label.col-sm-4 Start:
+                .row.mb-2
+                  label.col-sm-4.col-form-label(for='') Start:
                   .col-sm-8
-                    p.form-control 2018-09-24T08:00:00-08:00
-                .form-group
-                  label.control-label.col-sm-4 Duration:
+                    input.form-control(type='text', name='startDT', value='2018-09-24T08:00:00-08:00')
+                .row.mb-2
+                  label.col-sm-4.col-form-label(for='') Duration:
                   .col-sm-8
                     input.form-control(type='text', name='name')
-                .form-group
-                  label.control-label.col-sm-4 Controller:
+                .row.mb-2
+                  label.col-sm-4.col-form-label(for='') Controller:
                   .col-sm-8
                     select.form-control(name='controllerID', value='')
                       option blah
                       option blahBlah
-                .form-group
-                  label.control-label.col-sm-4 Temperature:
+                .row.mb-2
+                  label.col-sm-4.col-form-label(for='') Temperature:
                   .col-sm-8
                     input.form-control(type='text', name='setpoint')
-                .form-group
-                  label.control-label.col-sm-4 Notes:
+                .row.mb-2
+                  label.col-sm-4.col-form-label(for='') Notes:
                   .col-sm-8
                     textarea(name='notes', cols=100 , rows=5, style="max-width:100%;")
-                .form-group
-                .col-sm-offset-4.col-sm-8
-                  input.form-control(type='submit', value='Add Step')
+                .row.mb-2
+                  .col-sm-8.offset-sm-4
+                    input.form-control(type='submit', value='Add Step')
