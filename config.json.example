@@ -1,7 +1,6 @@
 {
-  "db_user": "<enter database username to connect with>",
-  "db_pw": "<enter database password to connect with>",
-  "db_addr": "<mongo database address URL>",
+  "app_name": "<enter the name you want to show in the navbar corner on every page>"
+  "db_addr": "<mongo database address URL including login credential>",
   "control_login": "<username for access to the Config section of the app>",
   "control_password": "<password for access to the Config section of the app>",
   "socket_addr": "<server address for live data>",
