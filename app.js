@@ -164,6 +164,7 @@ function stopControllers() {
 }
 
 function startup() {
+  startControllers();
 
   emitter.on('controllerUpdate', function(controller){
     refreshController(controller);
@@ -192,8 +193,6 @@ function startup() {
     clientSocket.on('connect', function () { 
       logger.info('app.js: connected as a client only to the mothership!');
     });
-  } else {
-    startControllers();
   }
 
   server.listen(port);
