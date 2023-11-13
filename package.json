@@ -1,6 +1,6 @@
 {
   "name": "brewberry",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "Records temperature to a MongoDB and runs a websocket server for live temperature.",
   "main": "app.js",
   "scripts": {
