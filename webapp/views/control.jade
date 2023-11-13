@@ -2,43 +2,42 @@ extends layout
 
 block content
   div
-    .row
-      .col-md-12
+    .row.mb-2
+      .col
         h4=title
-          span.pull-right
+          span.float-end
             a(href='/control/ctrlr/') New Controller
         hr
-    .row
+    .row.row-cols-1.row-cols-md-2
       if controllers.length > 0
         each controller in controllers
-          .col-sm-6.col-md-6
-            .panel.panel-default
-              .panel-heading
-                label=controller.name
-                span.pull-right
+          .col
+            .card.mb-4
+              .card-header
+                b=controller.name
+                span.float-end
                     a(href='/control/ctrlr/' + controller._id) Edit Controller
-              .panel-body
+              .card-body
                 p
-                  label.control-label Enabled:&nbsp
+                  b.control-label Enabled:&nbsp
                   | #{controller.enabled}
                 p
-                  label Model:&nbsp
+                  b Model:&nbsp
                   | #{controller.model}
                 p
-                  label Update Rate:&nbsp
+                  b Update Rate:&nbsp
                   | #{controller.updateRate}
                 hr
                 p
                   if controller.sensor
-                    label Sensor:&nbsp
+                    b Sensor:&nbsp
                     | #{controller.sensor.name} (#{controller.sensor.model} @ #{controller.sensor.id})
                 p
                   if controller.output
-                    label Output:&nbsp
+                    b Output:&nbsp
                     | #{controller.output.name} (#{controller.output.model} @ #{controller.output.id})
               if Object.keys(controller.param).length > 0
-                .panel-heading
-                  label Parameters:
+                .card-header Parameters:
                 table.table.table-bordered
                   tr
                     th Name
