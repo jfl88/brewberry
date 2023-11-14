@@ -28,6 +28,10 @@ class SineSim {
     else
       return this.lastRecord.temp;
   }
+
+  init() {
+    
+  }
 }
 
 module.exports = SineSim;

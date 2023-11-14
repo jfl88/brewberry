@@ -24,6 +24,10 @@ class ds18b20 {
             return false;
         }
     }
+
+    init() {
+        
+    }
 }
 
 module.exports = ds18b20;
