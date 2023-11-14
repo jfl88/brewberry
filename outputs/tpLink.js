@@ -21,6 +21,10 @@ class TPLink {
         
         this.lastSwitched = new Date().getTime();
       })
+    })
+    .catch(error => {
+      logger.error('tpLink.js: Error connecting to device');
+      logger.error('tpLink.js: ' + error);
     });
   }
 
