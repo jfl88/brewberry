@@ -11,21 +11,6 @@ class TPLink {
 
     this.lastSwitched = 0;
     this.state = 0;
-
-    tplinkClient.getDevice({ host: this.id }).then((plug)=> {
-      plug.getPowerState().then((result)=> {
-        if (result)
-          this.state = 1;
-        else
-          this.state = 0;
-        
-        this.lastSwitched = new Date().getTime();
-      })
-    })
-    .catch(error => {
-      logger.error('tpLink.js: Error connecting to device');
-      logger.error('tpLink.js: ' + error);
-    });
   }
 
   outputOn() {
@@ -72,6 +57,23 @@ class TPLink {
 
   getStatus() {
     return { "id": this.id, "name": this.name, "model": this.model, "state": this.state, "lastSwitched": this.lastSwitched };
+  }
+
+  init() {
+    tplinkClient.getDevice({ host: this.id }).then((plug)=> {
+      plug.getPowerState().then((result)=> {
+        if (result)
+          this.state = 1;
+        else
+          this.state = 0;
+        
+        this.lastSwitched = new Date().getTime();
+      })
+    })
+    .catch(error => {
+      logger.error('tpLink.js: Error connecting to device');
+      logger.error('tpLink.js: ' + error);
+    });
   }
 }
 
