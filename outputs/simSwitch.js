@@ -24,6 +24,10 @@ class SimSwitch {
     getStatus() {
         return { "state": this.state, "lastSwitched": this.lastSwitched };
     }
+
+    init() {
+        
+    }
 }
 
 module.exports = SimSwitch;
