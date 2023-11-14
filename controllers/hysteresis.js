@@ -62,8 +62,10 @@ class Hysteresis {
 
   startControl() {
     this.interval = setInterval(this.update.bind(this), this.updateRate);
-    this.sensor.init();
-    this.output.init();
+    if (this.sensor)
+      this.sensor.init();
+    if (this.output)
+      this.output.init();
     this.runningState = 1;
     return this.runningState;
   }
