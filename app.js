@@ -147,6 +147,29 @@ function refreshController(controller) {
   });
   // @todo: livetemp should send record instead of controller
   io.emit('liveTemp', controller);
+
+  if (Object.hasOwn(config, "brewfather_addr"))
+    if (config.brewfather_addr != "")
+      fetch(
+        config.brewfather_addr,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(
+            {
+              'name': controller.name,
+              'temp': controller.sensor.currentRecord.temp,
+              'temp_unit': "C",
+              'device_state': controller.output.state
+            }
+          )
+        }
+      )
+      .then(response => response.json())
+      .then(result => logger.log('Success: ' + result))
+      .catch(error => logger.error('Error: ' + error));
 }
 
 function stopControllers() {
