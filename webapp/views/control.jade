@@ -36,14 +36,30 @@ block content
                   if controller.output
                     b Output:&nbsp
                     | #{controller.output.name} (#{controller.output.model} @ #{controller.output.id})
-              if Object.keys(controller.param).length > 0
+              if controller.param && Object.keys(controller.param).length > 0
                 .card-header Parameters:
-                table.table.table-bordered
-                  tr
-                    th Name
-                    th Value
-                  each item, name in controller.param
+                // If steps present, show schedule
+                if controller.param.steps && controller.param.steps.length > 0
+                  table.table.table-bordered
                     tr
-                      td #{name}
-                      td #{item}
+                      th Step
+                      th Temperature
+                      th Duration
+                    each step, idx in controller.param.steps
+                      tr
+                        td #{idx + 1}
+                        td #{step.temperature}°C
+                        - var d = step.duration || 0
+                        - var days = Math.floor(d / 86400000)
+                        - var hours = Math.floor((d % 86400000) / 3600000)
+                        td #{days}d #{hours}h
+                else
+                  table.table.table-bordered
+                    tr
+                      th Name
+                      th Value
+                    each item, name in controller.param
+                      tr
+                        td #{name}
+                        td #{item}
 

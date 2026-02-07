@@ -34,21 +34,121 @@ block content
               .row.mb-2
                 label.col-sm-4.col-form-label(for='model') Model:
                 .col-sm-8
-                  select.form-control(name='model')
-                    option #{controller.model}
+                  select.form-control(name='model', id='modelSelect')
+                    option(value='') Select model
+                    option(value='Hysteresis', selected=controller.model==='Hysteresis') Hysteresis
+                    option(value='ReadOnly', selected=controller.model==='ReadOnly') ReadOnly
               .row.mb-2
                 label.col-sm-4.col-form-label(for='updateRate') Update Rate:
                 .col-sm-8
                   input.form-control(type='text', name='updateRate', value=controller.updateRate)
-            if Object.keys(controller.param).length > 0
-              .card-header
-                label Parameters:
-              .card-body
-                each item, name in controller.param
-                  .row.mb-2
-                    label.col-sm-6.col-form-label(for='param[#{name}]') #{name}:
-                    .col-sm-6
-                      input.form-control(type='text', name='param[#{name}]', value=item)
+            .card-header
+              label Parameters:
+            .card-body
+              // Single setpoint params (shown for Hysteresis without steps)
+              #singleParams
+                .row.mb-2
+                  label.col-sm-6.col-form-label(for='param[setpoint]') Setpoint:
+                  .col-sm-6
+                    input.form-control(type='text', name='param[setpoint]', value=controller.param && controller.param.setpoint ? controller.param.setpoint : '')
+                .row.mb-2
+                  label.col-sm-6.col-form-label(for='param[onDeadband]') On deadband:
+                  .col-sm-6
+                    input.form-control(type='text', name='param[onDeadband]', value=controller.param && controller.param.onDeadband ? controller.param.onDeadband : '')
+                .row.mb-2
+                  label.col-sm-6.col-form-label(for='param[offDeadband]') Off deadband:
+                  .col-sm-6
+                    input.form-control(type='text', name='param[offDeadband]', value=controller.param && controller.param.offDeadband ? controller.param.offDeadband : '')
+                .row.mb-2
+                  label.col-sm-6.col-form-label(for='param[minOnTime]') Min On Time (s):
+                  .col-sm-6
+                    input.form-control(type='text', name='param[minOnTime]', value=controller.param && controller.param.minOnTime ? controller.param.minOnTime : '')
+                .row.mb-2
+                  label.col-sm-6.col-form-label(for='param[minOffTime]') Min Off Time (s):
+                  .col-sm-6
+                    input.form-control(type='text', name='param[minOffTime]', value=controller.param && controller.param.minOffTime ? controller.param.minOffTime : '')
+
+              // Steps editor (for Hysteresis schedules)
+              #stepsEditor
+                .mb-2
+                  button.btn.btn-sm.btn-outline-primary(type='button', id='addStep') Add Step
+                table.table
+                  thead
+                    tr
+                      th #
+                      th Temperature (°C)
+                      th Duration (ms)
+                      th Actions
+                  tbody(id='stepsBody')
+                    - var steps = (controller.param && controller.param.steps) ? controller.param.steps : []
+                    if steps.length === 0
+                      tr
+                        td(colspan='4') No steps defined
+                    else
+                      each step, idx in steps
+                        tr
+                          td #{idx + 1}
+                          td
+                            input.form-control(type='text', name='param[steps][#{idx}][temperature]', value=step.temperature)
+                          td
+                            input.form-control(type='text', name='param[steps][#{idx}][duration]', value=step.duration)
+                          td
+                            button.btn.btn-sm.btn-outline-danger(type='button', onclick='removeStep(this)') Remove
+
+              script.
+                (function(){
+                  function $(s){return document.querySelector(s)}
+                  function $all(s){return document.querySelectorAll(s)}
+
+                  var modelSelect = $('#modelSelect');
+                  var singleParams = $('#singleParams');
+                  var stepsEditor = $('#stepsEditor');
+
+                  function toggleEditors(){
+                    var m = modelSelect.value;
+                    if (m === 'Hysteresis'){
+                      singleParams.style.display = '';
+                      stepsEditor.style.display = '';
+                    } else if (m === 'ReadOnly'){
+                      singleParams.style.display = 'none';
+                      stepsEditor.style.display = 'none';
+                    } else {
+                      singleParams.style.display = '';
+                      stepsEditor.style.display = 'none';
+                    }
+                  }
+
+                  modelSelect && modelSelect.addEventListener('change', toggleEditors);
+                  document.addEventListener('DOMContentLoaded', function(){ toggleEditors(); });
+
+                  window.removeStep = function(btn){
+                    var tr = btn.closest('tr');
+                    tr.parentNode.removeChild(tr);
+                    // renumber rows and names
+                    var rows = Array.prototype.slice.call(document.querySelectorAll('#stepsBody tr'));
+                    rows.forEach(function(r,i){
+                      var inputs = r.querySelectorAll('input');
+                      if (inputs.length >= 2){
+                        inputs[0].setAttribute('name', 'param[steps]['+i+'][temperature]');
+                        inputs[1].setAttribute('name', 'param[steps]['+i+'][duration]');
+                        r.querySelector('td').textContent = i+1;
+                      }
+                    });
+                  };
+
+                  $('#addStep') && $('#addStep').addEventListener('click', function(){
+                    var tbody = document.getElementById('stepsBody');
+                    // remove 'No steps defined' row if present
+                    if (tbody.children.length === 1 && tbody.children[0].children.length === 1){ tbody.innerHTML = ''; }
+                    var idx = tbody.children.length;
+                    var tr = document.createElement('tr');
+                    tr.innerHTML = '<td>'+ (idx+1) +'</td>'+
+                      '<td><input class="form-control" type="text" name="param[steps]['+idx+'][temperature]" value=""></td>'+
+                      '<td><input class="form-control" type="text" name="param[steps]['+idx+'][duration]" value=""></td>'+
+                      '<td><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeStep(this)">Remove</button></td>';
+                    tbody.appendChild(tr);
+                  });
+                })();
         .col-sm-4.col-md-4
           .card
             .card-header Sensor

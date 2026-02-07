@@ -33,8 +33,29 @@ var auth = function (req, res, next) {
 
 // Display Control Panel page
 router.get('/', auth, function(req, res, next){
-  
-  res.render('control', { app_name: config.app_name, title: 'Brewing Control Centre', controllers: config.controllers });
+  // Load controllers from DB so we can show schedule/params
+  MongoClient.connect(url, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  }, function(err, client){
+    if (err) {
+      logger.error('control.js: Error connecting to mongodb: ' + JSON.stringify(err));
+      // fallback to config
+      return res.render('control', { app_name: config.app_name, title: 'Brewing Control Centre', controllers: config.controllers });
+    }
+
+    client.db().collection('controllers')
+      .find()
+      .toArray(function(err, docs) {
+        if (err) {
+          logger.error('control.js: Error fetching controllers: ' + JSON.stringify(err));
+          res.render('control', { app_name: config.app_name, title: 'Brewing Control Centre', controllers: config.controllers });
+        } else {
+          res.render('control', { app_name: config.app_name, title: 'Brewing Control Centre', controllers: docs });
+        }
+        client.close();
+      });
+  });
 });
 
 // ***** START LOGS PAGE ***** //
