@@ -37,29 +37,73 @@ block content
                     b Output:&nbsp
                     | #{controller.output.name} (#{controller.output.model} @ #{controller.output.id})
               if controller.param && Object.keys(controller.param).length > 0
-                .card-header Parameters:
-                // If steps present, show schedule
-                if controller.param.steps && controller.param.steps.length > 0
-                  table.table.table-bordered
-                    tr
-                      th Step
-                      th Temperature
-                      th Duration
-                    each step, idx in controller.param.steps
-                      tr
-                        td #{idx + 1}
-                        td #{step.temperature}°C
-                        - var d = step.duration || 0
-                        - var days = Math.floor(d / 86400000)
-                        - var hours = Math.floor((d % 86400000) / 3600000)
-                        td #{days}d #{hours}h
-                else
+                .card-header
+                  label Parameters:
+                // Show non-steps parameters
+                .card-body
                   table.table.table-bordered
                     tr
                       th Name
                       th Value
-                    each item, name in controller.param
+                    if controller.param.setpoint !== undefined
                       tr
-                        td #{name}
-                        td #{item}
+                        td Setpoint
+                        td #{controller.param.setpoint}°C
+                    if controller.param.onDeadband !== undefined
+                      tr
+                        td On Deadband
+                        td #{controller.param.onDeadband}
+                    if controller.param.offDeadband !== undefined
+                      tr
+                        td Off Deadband
+                        td #{controller.param.offDeadband}
+                    if controller.param.minOnTime !== undefined
+                      tr
+                        td Min On Time
+                        td #{controller.param.minOnTime}
+                    if controller.param.minOffTime !== undefined
+                      tr
+                        td Min Off Time
+                        td #{controller.param.minOffTime}
+                    if controller.param.stepsCompleteState !== undefined
+                      tr
+                        td On Completion Output
+                        td #{controller.param.stepsCompleteState}
+                // Show steps schedule if present
+                if controller.param.steps && controller.param.steps.length > 0
+                  .card-header
+                    label Schedule:
+                  .card-body
+                    .row.mb-2
+                      p
+                        b State After Final Step:&nbsp
+                        | #{controller.param.stepsCompleteState}
+                    table.table.table-bordered
+                      tr
+                        th Step
+                        th Temperature
+                        th Duration
+                        th Duration Remaining
+                      each step, idx in controller.param.steps
+                        tr
+                          td #{idx + 1}
+                          td #{step.temperature}°C
+                          - var d = step.duration || 0
+                          - var days = Math.floor(d / 86400000)
+                          - var hours = Math.floor((d % 86400000) / 3600000)
+                          td #{days}d #{hours}h
+                          td
+                            - if (idx === controller.param.currentStepIndex && controller.param.stepsProgress !== undefined)
+                              - var remaining = Math.max(0, d * (100 - controller.param.stepsProgress) / 100)
+                              - var remDays = Math.floor(remaining / 86400000)
+                              - var remHours = Math.floor((remaining % 86400000) / 3600000)
+                              | #{remDays}d #{remHours}h
+                            - else if (idx > controller.param.currentStepIndex)
+                              | #{days}d #{hours}h
+                            - else
+                              | 0d 0h
+                    if controller.param.stepsProgress !== undefined
+                      b Progress:
+                      .progress
+                        .progress-bar(role='progressbar', style='width:' + controller.param.stepsProgress + '%', aria-valuenow=controller.param.stepsProgress, aria-valuemin='0', aria-valuemax='100') #{controller.param.stepsProgress}%
 

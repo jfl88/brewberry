@@ -24,6 +24,8 @@ class Hysteresis extends Controller {
         if (isNaN(step.duration))
           validationErrors.push(this.constructor.name + ' controller validation failure: step ' + i + ' duration must be a number!');
       }
+      if (param.stepsCompleteState && (param.stepsCompleteState !== 'on' && param.stepsCompleteState !== 'off'))
+        validationErrors.push(this.constructor.name + ' controller validation failure: stepsCompleteState must be "on" or "off"');
     } else {
       // Validate single setpoint parameters
       if (isNaN(param.setpoint))
@@ -58,6 +60,14 @@ class Hysteresis extends Controller {
       
       this.currentStepIndex = param.currentStepIndex || 0;
       this.stepStartTime = param.stepStartTime ? new Date(param.stepStartTime) : null;
+      // set initial setpoint to current step temperature for visibility
+      if (this.param.steps.length > 0)
+        this.param.setpoint = this.param.steps[this.currentStepIndex].temperature;
+      // configure stepsCompleteState ('on'|'off'), default 'off'
+      this.param.stepsCompleteState = (param.stepsCompleteState === 'on') ? 'on' : 'off';
+      // expose currentStepIndex and stepStartTime for views
+      this.param.currentStepIndex = this.currentStepIndex;
+      this.param.stepStartTime = this.stepStartTime;
     } else {
       this.param = {};
       this.param.setpoint = parseFloat(param.setpoint);
@@ -69,20 +79,25 @@ class Hysteresis extends Controller {
   }
 
   getCurrentSetpoint() {
-    if (hasSteps) {
+    if (this.param && Array.isArray(this.param.steps) && this.param.steps.length > 0) {
       if (this.currentStepIndex >= this.param.steps.length)
         return this.param.steps[this.param.steps.length - 1].temperature;
       return this.param.steps[this.currentStepIndex].temperature;
     }
-    return this.param.setpoint;
+    return this.param ? this.param.setpoint : null;
   }
 
   advanceStep() {
     if (Array.isArray(this.param.steps) && this.currentStepIndex < this.param.steps.length - 1) {
       this.currentStepIndex++;
       this.stepStartTime = new Date();
+      // update visible setpoint to match new step
+      this.param.setpoint = this.getCurrentSetpoint();
+      // expose updated indices to param for views
+      this.param.currentStepIndex = this.currentStepIndex;
+      this.param.stepStartTime = this.stepStartTime;
       logger.info('hysteresis.js: ' + this.name + ' advanced to step ' + (this.currentStepIndex + 1) + 
-        ' - temperature: ' + this.getCurrentSetpoint() + '°C');
+        ' - temperature: ' + this.param.setpoint + '°C');
       emitter.emit('scheduleStepAdvanced', { controller: this.name, step: this.currentStepIndex + 1 });
       return true;
     }
@@ -112,7 +127,7 @@ class Hysteresis extends Controller {
 
   startControl() {
     // Initialize step tracking if using steps and not already set
-    if (hasSteps && !this.stepStartTime) {
+    if (this.param && Array.isArray(this.param.steps) && this.param.steps.length > 0 && !this.stepStartTime) {
       this.currentStepIndex = 0;
       this.stepStartTime = new Date();
     }
@@ -136,10 +151,29 @@ class Hysteresis extends Controller {
       this.sensor.currentRecord.timestamp = new Date();
 
       // Check if current step duration has elapsed
-      if (hasSteps && this.stepStartTime) {
+      if (this.param && Array.isArray(this.param.steps) && this.param.steps.length > 0 && this.stepStartTime) {
         var elapsedTime = this.sensor.currentRecord.timestamp - this.stepStartTime;
         if (elapsedTime >= this.param.steps[this.currentStepIndex].duration) {
-          this.advanceStep();
+          // if there is a next step, advance; otherwise mark the schedule complete and disable controller
+          if (this.currentStepIndex < this.param.steps.length - 1) {
+            this.advanceStep();
+          } else {
+            // final step complete
+            this.param.stepsProgress = 100;
+            this.stepStartTime = null;
+            this.param.stepStartTime = null;
+            // leave output in configured state
+            if (this.param && this.param.stepsCompleteState === 'on') {
+              if (this.output && typeof this.output.outputOn === 'function')
+                this.output.outputOn();
+            } else {
+              if (this.output && typeof this.output.outputOff === 'function')
+                this.output.outputOff();
+            }
+            this.enabled = false;
+            logger.info('hysteresis.js: ' + this.name + ' completed final step; disabling controller and setting output to ' + (this.param && this.param.stepsCompleteState ? this.param.stepsCompleteState : 'off'));
+            emitter.emit('scheduleComplete', { controller: this.name });
+          }
         }
       }
 
@@ -151,6 +185,19 @@ class Hysteresis extends Controller {
             this.output.outputOn();
           else if (this.output.state && this.sensor.currentRecord.temp < (currentSetpoint + this.param.offDeadband) && (this.output.lastSwitched + this.param.minOnTime * 1000) < this.sensor.currentRecord.timestamp)
             this.output.outputOff();
+
+        // update steps progress param for views and emitter
+        try {
+          const prog = this.getProgress();
+          if (prog && typeof prog.percentInStep === 'number') {
+            if (!this.param) this.param = {};
+            this.param.stepsProgress = prog.percentInStep;
+          } else if (this.param && this.param.stepsProgress !== undefined) {
+            delete this.param.stepsProgress;
+          }
+        } catch (e) {
+          // ignore progress calc errors
+        }
 
         emitter.emit('controllerUpdate', this);
       }
