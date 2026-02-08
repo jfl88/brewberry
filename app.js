@@ -170,6 +170,45 @@ function refreshController(controller) {
       .catch(error => logger.error('Error: ' + error));
 }
 
+function persistControllerState(controller) {
+  // Update the controller record in the controllers collection to preserve step state
+  if (!controller.id) {
+    logger.warn('app.js: Cannot persist controller state - no controller id');
+    return;
+  }
+
+  const ObjectId = require('mongodb').ObjectId;
+  let query = {};
+  if (ObjectId.isValid(controller.id)) {
+    query = { "_id": ObjectId(controller.id) };
+  } else {
+    query = { "id": controller.id };
+  }
+
+  MongoClient.connect(config.db_addr, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  }, function(err, client) {
+    if (err) {
+      logger.error('app.js: Error connecting to mongodb for persist: ' + JSON.stringify(err));
+      return;
+    }
+
+    client.db().collection('controllers').updateOne(query, {
+      $set: {
+        param: controller.param,
+        enabled: controller.enabled
+      }
+    }, (err, result) => {
+      if (err)
+        logger.error('app.js: Error persisting controller state: ' + err.message);
+      else if (result.matchedCount === 0)
+        logger.warn('app.js: No controller found to persist for: ' + controller.id);
+      client.close();
+    });
+  });
+}
+
 function stopControllers() {
   if (!config.client_only) {
     logger.info('app.js: shutting down controllers');
@@ -196,6 +235,22 @@ function startup() {
     startControllers();
     if (config.client_only)
       clientSocket.emit('reloadControllers');
+  });
+
+  emitter.on('scheduleStepAdvanced', function(event){
+    // When a step advances, find the controller and persist its state
+    const controller = controllers.find(c => c.name === event.controller);
+    if (controller) {
+      persistControllerState(controller);
+    }
+  });
+
+  emitter.on('scheduleComplete', function(event){
+    // When a schedule completes, persist the final controller state
+    const controller = controllers.find(c => c.name === event.controller);
+    if (controller) {
+      persistControllerState(controller);
+    }
   });
 
   io.on('connection', function(socket){
