@@ -23,6 +23,7 @@ class Hysteresis extends Controller {
           validationErrors.push(this.constructor.name + ' controller validation failure: step ' + i + ' temperature must be a number!');
         if (isNaN(step.duration))
           validationErrors.push(this.constructor.name + ' controller validation failure: step ' + i + ' duration must be a number!');
+        // name is optional, no validation needed
       }
       if (param.stepsCompleteState && (param.stepsCompleteState !== 'on' && param.stepsCompleteState !== 'off'))
         validationErrors.push(this.constructor.name + ' controller validation failure: stepsCompleteState must be "on" or "off"');
@@ -49,6 +50,7 @@ class Hysteresis extends Controller {
       this.param.steps = [];
       for (let i = 0; i < param.steps.length; i++) {
         this.param.steps.push({
+          name: param.steps[i].name || '',
           temperature: parseFloat(param.steps[i].temperature),
           duration: parseInt(param.steps[i].duration)
         });

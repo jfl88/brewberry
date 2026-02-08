@@ -86,6 +86,7 @@ block content
                     thead
                       tr
                         th #
+                        th Name
                         th Temperature (°C)
                         th Duration (days)
                         th Actions
@@ -98,6 +99,8 @@ block content
                         each step, idx in steps
                           tr
                             td #{idx + 1}
+                            td
+                              input.form-control(type='text', name='param[steps][#{idx}][name]', value=step.name)
                             td
                               input.form-control(type='text', name='param[steps][#{idx}][temperature]', value=step.temperature)
                             td
@@ -143,9 +146,10 @@ block content
                     var rows = Array.prototype.slice.call(document.querySelectorAll('#stepsBody tr'));
                     rows.forEach(function(r,i){
                       var inputs = r.querySelectorAll('input');
-                      if (inputs.length >= 2){
-                        inputs[0].setAttribute('name', 'param[steps]['+i+'][temperature]');
-                        inputs[1].setAttribute('name', 'param[steps]['+i+'][duration]');
+                      if (inputs.length >= 3){
+                        inputs[0].setAttribute('name', 'param[steps]['+i+'][name]');
+                        inputs[1].setAttribute('name', 'param[steps]['+i+'][temperature]');
+                        inputs[2].setAttribute('name', 'param[steps]['+i+'][duration]');
                         r.querySelector('td').textContent = i+1;
                       }
                     });
@@ -158,6 +162,7 @@ block content
                     var idx = tbody.children.length;
                     var tr = document.createElement('tr');
                     tr.innerHTML = '<td>'+ (idx+1) +'</td>'+
+                      '<td><input class="form-control" type="text" name="param[steps]['+idx+'][name]" value="" placeholder="optional"></td>'+
                       '<td><input class="form-control" type="text" name="param[steps]['+idx+'][temperature]" value=""></td>'+
                       '<td><input class="form-control" type="text" name="param[steps]['+idx+'][duration]" value="" placeholder="days"></td>'+
                       '<td><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeStep(this)">Remove</button></td>';

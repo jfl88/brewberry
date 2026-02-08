@@ -81,12 +81,14 @@ block content
                     table.table.table-bordered
                       tr
                         th Step
+                        th Name
                         th Temperature
                         th Duration
                         th Duration Remaining
                       each step, idx in controller.param.steps
                         tr
                           td #{idx + 1}
+                          td #{step.name || '-'}
                           td #{step.temperature}°C
                           - var d = step.duration || 0
                           - var days = Math.floor(d / 86400000)
