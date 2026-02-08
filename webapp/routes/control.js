@@ -211,16 +211,66 @@ router.post('/ctrlr/:id?', auth, function(req, res, next) {
     updateRate: req.body.updateRate,
     param: req.body.param
   }
+  // If editing an existing controller, fetch the current record and preserve its
+  // `param` object when the submitted form did not include any `param` data.
+  if (req.params.id && ObjectId.isValid(req.params.id)) {
+    MongoClient.connect(url, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    }, function(err, client){
+      if (err) {
+        logger.error('control.js: Error connecting to mongodb: ' + JSON.stringify(err));
+        res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: submittedController, flashMsg: 'DB connection error' });
+        return;
+      }
 
-  try {
-    controller = Controller.newController(submittedController);
-  } catch (e) {
-    logger.info('control.js: ' + JSON.stringify(e));
-    res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: submittedController, flashMsg: e });
-    return;
-  }
-  
-  if (!req.params.id || !ObjectId.isValid(req.params.id))
+      client.db().collection('controllers').findOne({ "_id": ObjectId(req.params.id)}, function(err, existing){
+        assert.equal(err, null);
+        // If no param submitted, decide whether to preserve or clear based on model change.
+        if (!submittedController.param) {
+          if (existing && existing.model && existing.model !== submittedController.model) {
+            // Model changed: do not carry over previous params; start with empty object
+            submittedController.param = {};
+          } else if (existing && existing.param) {
+            // Same model (or existing model absent): preserve previous params
+            submittedController.param = existing.param;
+          } else {
+            submittedController.param = {};
+          }
+        }
+
+        try {
+          controller = Controller.newController(submittedController);
+        } catch (e) {
+          logger.info('control.js: ' + JSON.stringify(e));
+          res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: submittedController, flashMsg: e });
+          client.close();
+          return;
+        }
+
+        client.db().collection('controllers')
+        .replaceOne({ "_id": ObjectId(req.params.id)}, controller, { returnOriginal: false }, function(err, r){
+          assert.equal(null, err);
+
+          controller._id = req.params.id;
+
+          logger.info('control.js: Updated controller: ' + controller.name + ', reloading controllers.');
+          emitter.emit('controllerReload');
+          res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: controller });
+          client.close();
+        });
+      });
+    });
+  } else {
+    // Creating a new controller: validate submitted data as before
+    try {
+      controller = Controller.newController(submittedController);
+    } catch (e) {
+      logger.info('control.js: ' + JSON.stringify(e));
+      res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: submittedController, flashMsg: e });
+      return;
+    }
+
     MongoClient.connect(url, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
@@ -228,30 +278,14 @@ router.post('/ctrlr/:id?', auth, function(req, res, next) {
       client.db().collection('controllers')
       .insertOne(controller, function(err, r){
         assert.equal(null, err);
-    
+
         logger.info('control.js: Created controller: ' + controller.name + ', reloading controllers.');
         emitter.emit('controllerReload');
         res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: controller });
         client.close();
       });
     });
-  else
-    MongoClient.connect(url, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true,
-    }, function(err, client){
-      client.db().collection('controllers')
-      .replaceOne({ "_id": ObjectId(req.params.id)}, controller, { returnOriginal: false }, function(err, r){
-        assert.equal(null, err);
-        
-        controller._id = req.params.id;
-
-        logger.info('control.js: Updated controller: ' + controller.name + ', reloading controllers.');
-        emitter.emit('controllerReload');
-        res.render('controller', { app_name: config.app_name, title: 'Edit Controller', controller: controller });
-        client.close();
-      });
-    });
+  }
 });
 
 // ***** END CTRLR PAGE ***** //
