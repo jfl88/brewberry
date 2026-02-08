@@ -138,12 +138,10 @@ function refreshController(controller) {
       useNewUrlParser: true,
     }, function(err, client) {
     client.db().collection('controllerLog').insertOne(record, (err, result) => {
-      
       if (err)
         logger.error('app.js: Error writing to collection: ' + err.message)
+      client.close();
     });
-    
-    client.close();
   });
   // @todo: livetemp should send record instead of controller
   io.emit('liveTemp', controller);
