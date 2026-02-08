@@ -1,8 +1,9 @@
 {
-  "app_name": "<enter the name you want to show in the navbar corner on every page>"
+  "app_name": "<enter the name you want to show in the navbar corner on every page>",
   "db_addr": "<mongo database address URL including login credential>",
   "control_login": "<username for access to the Config section of the app>",
   "control_password": "<password for access to the Config section of the app>",
   "socket_addr": "<server address for live data>",
-  "socket_port": <server port number for live data>
+  "socket_port": <server port number for live data>,
+  "client_only": 0
 }
