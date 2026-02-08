@@ -43,36 +43,36 @@ block content
                 label.col-sm-4.col-form-label(for='updateRate') Update Rate:
                 .col-sm-8
                   input.form-control(type='text', name='updateRate', value=controller.updateRate)
-            .card-header
-              label Parameters:
-            .card-body
-              // Single setpoint params (shown for Hysteresis without steps)
-              #singleParams
-                .row.mb-2
-                  label.col-sm-6.col-form-label(for='param[setpoint]') Setpoint:
-                  .col-sm-6
-                    input.form-control(type='text', name='param[setpoint]', value=controller.param && controller.param.setpoint ? controller.param.setpoint : '')
-                .row.mb-2
-                  label.col-sm-6.col-form-label(for='param[onDeadband]') On deadband:
-                  .col-sm-6
-                    input.form-control(type='text', name='param[onDeadband]', value=controller.param && controller.param.onDeadband ? controller.param.onDeadband : '')
-                .row.mb-2
-                  label.col-sm-6.col-form-label(for='param[offDeadband]') Off deadband:
-                  .col-sm-6
-                    input.form-control(type='text', name='param[offDeadband]', value=controller.param && controller.param.offDeadband ? controller.param.offDeadband : '')
-                .row.mb-2
-                  label.col-sm-6.col-form-label(for='param[minOnTime]') Min On Time (s):
-                  .col-sm-6
-                    input.form-control(type='text', name='param[minOnTime]', value=controller.param && controller.param.minOnTime ? controller.param.minOnTime : '')
-                .row.mb-2
-                  label.col-sm-6.col-form-label(for='param[minOffTime]') Min Off Time (s):
-                  .col-sm-6
-                    input.form-control(type='text', name='param[minOffTime]', value=controller.param && controller.param.minOffTime ? controller.param.minOffTime : '')
-            .card-header
-              label Schedule:
-            .card-body
-              // Steps editor (for Hysteresis schedules)
-              #stepsEditor
+            // Single setpoint params (shown for Hysteresis without steps)
+            #singleParams
+              .card-header
+                label Parameters:
+              .card-body
+                  .row.mb-2
+                    label.col-sm-6.col-form-label(for='param[setpoint]') Setpoint:
+                    .col-sm-6
+                      input.form-control(type='text', name='param[setpoint]', value=controller.param && controller.param.setpoint ? controller.param.setpoint : '')
+                  .row.mb-2
+                    label.col-sm-6.col-form-label(for='param[onDeadband]') On deadband:
+                    .col-sm-6
+                      input.form-control(type='text', name='param[onDeadband]', value=controller.param && controller.param.onDeadband ? controller.param.onDeadband : '')
+                  .row.mb-2
+                    label.col-sm-6.col-form-label(for='param[offDeadband]') Off deadband:
+                    .col-sm-6
+                      input.form-control(type='text', name='param[offDeadband]', value=controller.param && controller.param.offDeadband ? controller.param.offDeadband : '')
+                  .row.mb-2
+                    label.col-sm-6.col-form-label(for='param[minOnTime]') Min On Time (s):
+                    .col-sm-6
+                      input.form-control(type='text', name='param[minOnTime]', value=controller.param && controller.param.minOnTime ? controller.param.minOnTime : '')
+                  .row.mb-2
+                    label.col-sm-6.col-form-label(for='param[minOffTime]') Min Off Time (s):
+                    .col-sm-6
+                      input.form-control(type='text', name='param[minOffTime]', value=controller.param && controller.param.minOffTime ? controller.param.minOffTime : '')
+            // Steps editor (for Hysteresis schedules)
+            #stepsEditor
+              .card-header
+                label Schedule:
+              .card-body
                 .row.mb-2
                   label.col-sm-6.col-form-label(for='param[stepsCompleteState]') State After Final Step:
                   .col-sm-6
@@ -81,37 +81,36 @@ block content
                       option(value='off', selected=(controller.param && controller.param.stepsCompleteState === 'off')) Off
                 .row.mb-2
                   button.btn.btn-sm.btn-outline-primary(type='button', id='addStep') Add Step
-                table.table.table-bordered
-                  thead
-                    tr
-                      th #
-                      th Temperature (°C)
-                      th Duration (days)
-                      th Actions
-                  tbody(id='stepsBody')
-                    - var steps = (controller.param && controller.param.steps) ? controller.param.steps : []
-                    if steps.length === 0
+                .row.mb-2
+                  table.table.table-bordered
+                    thead
                       tr
-                        td(colspan='4') No steps defined
-                    else
-                      each step, idx in steps
+                        th #
+                        th Temperature (°C)
+                        th Duration (days)
+                        th Actions
+                    tbody(id='stepsBody')
+                      - var steps = (controller.param && controller.param.steps) ? controller.param.steps : []
+                      if steps.length === 0
                         tr
-                          td #{idx + 1}
-                          td
-                            input.form-control(type='text', name='param[steps][#{idx}][temperature]', value=step.temperature)
-                          td
-                            - var stepDays = step.duration / 86400000
-                            input.form-control(type='text', name='param[steps][#{idx}][duration]', value=stepDays.toFixed(), data-duration-ms=step.duration)
-                          td
-                            button.btn.btn-sm.btn-outline-danger(type='button', onclick='removeStep(this)') Remove
-
+                          td(colspan='4') No steps defined
+                      else
+                        each step, idx in steps
+                          tr
+                            td #{idx + 1}
+                            td
+                              input.form-control(type='text', name='param[steps][#{idx}][temperature]', value=step.temperature)
+                            td
+                              - var stepDays = step.duration / 86400000
+                              input.form-control(type='text', name='param[steps][#{idx}][duration]', value=stepDays.toFixed(), data-duration-ms=step.duration)
+                            td
+                              button.btn.btn-sm.btn-outline-danger(type='button', onclick='removeStep(this)') Remove
                 if controller.param && controller.param.stepsProgress !== undefined
-                  .mt-2
+                  .row.mb-2
                     b Progress:
                     .progress
                       .progress-bar(role='progressbar', style='width:' + controller.param.stepsProgress + '%', aria-valuenow=controller.param.stepsProgress, aria-valuemin='0', aria-valuemax='100') #{controller.param.stepsProgress}%
-
-              script.
+        script.
                 (function(){
                   function $(s){return document.querySelector(s)}
                   function $all(s){return document.querySelectorAll(s)}
@@ -185,7 +184,9 @@ block content
                 label.col-sm-4.col-form-label(for='sensor[model]') Model:
                 .col-sm-8
                   select.form-control(name='sensor[model]')
-                    option #{controller.sensor.model}
+                    option(value='') Select model
+                    option(value='SineSim', selected=controller.sensor.model==='SineSim') SineSim
+                    option(value='ds18b20', selected=controller.sensor.model==='ds18b20') ds18b20
               .row.mb-2
                 label.col-sm-4.col-form-label(for='sensor[id]') Identifier:
                 .col-sm-8
@@ -202,7 +203,9 @@ block content
                   label.col-sm-4.col-form-label(for='output[model]') Model:
                   .col-sm-8
                     select.form-control(name='output[model]')
-                      option #{controller.output.model}
+                      option(value='') Select model
+                      option(value='SimSwitch', selected=controller.output.model==='SimSwitch') SimSwitch
+                      option(value='TPLink', selected=controller.output.model==='TPLink') TPLink
                 .row.mb-2
                   label.col-sm-4.col-form-label(for='output[id]') Identifier:
                   .col-sm-8
