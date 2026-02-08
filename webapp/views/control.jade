@@ -91,15 +91,17 @@ block content
                           - var d = step.duration || 0
                           - var days = Math.floor(d / 86400000)
                           - var hours = Math.floor((d % 86400000) / 3600000)
-                          td #{days}d #{hours}h
+                          - var mins = Math.floor((d % 3600000) / 60000)
+                          td #{days}d #{hours}h #{mins}m
                           td
                             - if (idx === controller.param.currentStepIndex && controller.param.stepsProgress !== undefined)
                               - var remaining = Math.max(0, d * (100 - controller.param.stepsProgress) / 100)
                               - var remDays = Math.floor(remaining / 86400000)
                               - var remHours = Math.floor((remaining % 86400000) / 3600000)
-                              | #{remDays}d #{remHours}h
+                              - var remMins = Math.floor((remaining % 3600000) / 60000)
+                              | #{remDays}d #{remHours}h #{remMins}m
                             - else if (idx > controller.param.currentStepIndex)
-                              | #{days}d #{hours}h
+                              | #{days}d #{hours}h #{mins}m
                             - else
                               | 0d 0h
                     if controller.param.stepsProgress !== undefined

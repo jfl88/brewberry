@@ -102,7 +102,7 @@ block content
                               input.form-control(type='text', name='param[steps][#{idx}][temperature]', value=step.temperature)
                             td
                               - var stepDays = step.duration / 86400000
-                              input.form-control(type='text', name='param[steps][#{idx}][duration]', value=stepDays.toFixed(), data-duration-ms=step.duration)
+                              input.form-control(type='text', name='param[steps][#{idx}][duration]', value=stepDays.toFixed(2), data-duration-ms=step.duration)
                             td
                               button.btn.btn-sm.btn-outline-danger(type='button', onclick='removeStep(this)') Remove
                 if controller.param && controller.param.stepsProgress !== undefined
@@ -128,7 +128,7 @@ block content
                       singleParams.style.display = 'none';
                       stepsEditor.style.display = 'none';
                     } else {
-                      singleParams.style.display = '';
+                      singleParams.style.display = 'none';
                       stepsEditor.style.display = 'none';
                     }
                   }
